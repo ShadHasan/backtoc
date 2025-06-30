@@ -1,20 +1,13 @@
 // C standard includes
 #include <stdio.h>
+#include "platform.h"
 
-// OpenCL includes
-#include <CL/cl.h>
 
 int main()
 {
-    cl_int CL_err = CL_SUCCESS;
-    cl_uint numPlatforms = 0;
 
-    CL_err = clGetPlatformIDs( 0, NULL, &numPlatforms );
-
-    if (CL_err == CL_SUCCESS)
-        printf("%u platform(s) found\n", numPlatforms);
-    else
-        printf("clGetPlatformIDs(%i)\n", CL_err);
-
+	char pl_message[40];	// Since char * or char [] are both variable are already reference address. we don't need to use ampersand.
+	print_platform(pl_message);
+	printf("%s", pl_message);
     return 0;
 }
