@@ -6,8 +6,8 @@
 int main()
 {
 
-	char pl_message[40];	// Since char * or char [] are both variable are already reference address. we don't need to use ampersand.
+	char pl_message[1000];	// Since char * or char [] are both variable are already reference address. we don't need to use ampersand.
 	print_platform(pl_message);
-	printf("%s", pl_message);
+	printf("Final output: %s", pl_message);
     return 0;
 }
