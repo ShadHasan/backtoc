@@ -1,6 +1,7 @@
 // C standard includes
 #include <stdio.h>
 #include "platform.h"
+#include "model/2d_graph.h"
 
 
 int main()
@@ -8,6 +9,19 @@ int main()
 
 	char pl_message[1000];	// Since char * or char [] are both variable are already reference address. we don't need to use ampersand.
 	print_platform(pl_message);
-	printf("Final output: %s", pl_message);
+	printf("Final output: %s\n", pl_message);
+
+
+	// Testing struct after long time
+	pixel p0[10];
+	int p_iter;
+	for (p_iter = 0; p_iter < 10; p_iter++) {
+		p0[p_iter].r = 100;
+		p0[p_iter].g = 200;
+		p0[p_iter].b = 255;
+	}
+
+	printf("Zero pixel : %d %d %d\n", p0[0].r, p0[0].g, p0[0].b);
+
     return 0;
 }

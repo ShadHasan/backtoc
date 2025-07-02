@@ -3,6 +3,9 @@
 #include <string.h>
 #include <stdlib.h>
 
+
+// Below function is referred from: https://www.roselladb.com/opencl-program-example.htm
+
 void print_platform(char *message_buffer) {
 	cl_int CL_err = CL_SUCCESS;
     cl_uint numPlatforms = 0;
