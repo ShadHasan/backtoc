@@ -12,4 +12,5 @@ rem .\binary\putty\PLINK.EXE %user%@%remotehost% -pw "%password%" -batch "cd %re
 
 .\binary\putty\PLINK.EXE %user%@%remotehost% -pw "%password%" -batch "cd %remotedir%/src ; ./HelloOpenCL;"
 
-echo "Execution completed"
+echo 
+echo Execution completed

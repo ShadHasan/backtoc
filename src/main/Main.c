@@ -1,7 +1,9 @@
 // C standard includes
 #include <stdio.h>
-#include "platform.h"
+#include "utilities/opencl/platform.h"
 #include "model/2d_graph.h"
+#include "c_lib/math.h"
+#include "c_lib/math2.h"
 
 
 int main()
@@ -10,7 +12,6 @@ int main()
 	char pl_message[1000];	// Since char * or char [] are both variable are already reference address. we don't need to use ampersand.
 	print_platform(pl_message);
 	printf("Final output: %s\n", pl_message);
-
 
 	// Testing struct after long time
 	pixel p0[10];
@@ -22,6 +23,12 @@ int main()
 	}
 
 	printf("Zero pixel : %d %d %d\n", p0[0].r, p0[0].g, p0[0].b);
+
+	float sqr;
+
+	sqr = math_square(3.0);
+
+	printf("Square of 3 is %f", sqr);
 
     return 0;
 }
