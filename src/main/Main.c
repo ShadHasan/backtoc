@@ -4,6 +4,7 @@
 #include "model/2d_graph.h"
 #include "c_lib/math.h"
 #include "c_lib/math2.h"
+#include "utilities/fileIO.h"
 
 
 int main()
@@ -29,6 +30,12 @@ int main()
 	sqr = math_square(3.0);
 
 	printf("Square of 3 is %f", sqr);
+
+	char* content;
+
+	content = file_char_content("main/kernel_lib/array_add.pc");
+
+	printf("File content: %s", content);
 
     return 0;
 }
