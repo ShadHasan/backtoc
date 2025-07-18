@@ -7,5 +7,10 @@ typedef struct {
 
 typedef struct {
 	char name[400];
-	char** program_char_list;
-} kernel_program_map_ds;
+	char** program_name_list;
+} kernel_program_list_map_ds;
+
+typedef struct {
+	char name[400];
+	char* program_name_list;
+} kernel_program_map__ds;

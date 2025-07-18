@@ -24,3 +24,16 @@ char* file_char_content(char* file_path) {
 	}
 	return final;
 }
+
+
+int file_char_content_return_length(char* file_path, char* final) {
+	FILE *fp;
+	int file_char_counter = 0;
+	int c;
+	fp = fopen(file_path, "r");
+	while ((c = getc(fp))!= EOF) {
+		file_char_counter++;
+		final = incrementing_char(final, (char)c, file_char_counter);
+	}
+	return file_char_counter;
+}
