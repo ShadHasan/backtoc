@@ -1,0 +1,6 @@
+{
+	"test": [
+		"array_add",
+		"array_sum"
+	]
+}

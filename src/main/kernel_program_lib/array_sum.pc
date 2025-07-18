@@ -1,0 +1,16 @@
+// compute element-wise sums of INPUT1 and INPUT2;
+__kernel void ArrayADD ( 
+	int  wid,
+	int  hgt,
+	__global float *INPUT1,
+	__global float *INPUT2,
+	__global float *OUTPUT
+) {
+	int totalwork = wid * hgt;
+	int peIndex = get_global_id(0); // get process element index ID
+	if (peIndex >= totalwork) { // to filter extras
+		return;
+	}
+	OUTPUT[peIndex] = INPUT1[peIndex] + INPUT2[peIndex];
+}
+
