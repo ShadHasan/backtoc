@@ -12,5 +12,5 @@ typedef struct {
 
 typedef struct {
 	char name[400];
-	char* program_name_list;
+	char* program_char;
 } kernel_program_map__ds;

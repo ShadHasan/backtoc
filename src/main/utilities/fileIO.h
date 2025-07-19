@@ -26,9 +26,9 @@ char* file_char_content(char* file_path) {
 }
 
 
-int file_char_content_return_length(char* file_path, char* final) {
+uint file_char_content_return_length(char* file_path, char* final) {
 	FILE *fp;
-	int file_char_counter = 0;
+	uint file_char_counter = 0;
 	int c;
 	fp = fopen(file_path, "r");
 	while ((c = getc(fp))!= EOF) {
