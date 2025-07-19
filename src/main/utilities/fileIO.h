@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#ifndef ADVANIEN_FILEIO
+#define ADVANIEN_FILEIO
 
 char* incrementing_char(char* ptr, char c, uint length) {
 	if (ptr != NULL) {
@@ -37,3 +39,5 @@ uint file_char_content_return_length(char* file_path, char* final) {
 	}
 	return file_char_counter;
 }
+
+#endif

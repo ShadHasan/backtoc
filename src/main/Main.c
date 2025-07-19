@@ -36,16 +36,21 @@ int main()
 	printf("File content: %s", content);
 
 	// simple immutable string
-	char* test_string = "This is very long long string for the test that it can be by default initialized and it is immutable"
-			"hence changing anything in the string will lead to segmentation. And this is just for test its behavior";
-	unit char_count = 0;
-	while(test_string[char_count] != "\0") {
+	char test_string[] = "Thislong\n";
+
+	/* Too long string also cause segmentation fault
+	 * char* long_test_string = "This is very long long string for the test that it can be by default initialized and it is immutable";
+			"hence changing anything in the string will lead to segmentation. And this is just for test its behavior"; */
+
+	printf("hello");
+	/*uint char_count = 0;
+	while(test_string[char_count] != '\0') {
 		printf("%c", test_string[char_count]);
 		char_count++;
-	}
+	}*/
 
 	// Testing common data
-	kernel_program_list_map_ds kernal_list_map;
+	// kernel_program_list_map_ds kernal_list_map;
 
 	// Testing kernel map loading
 

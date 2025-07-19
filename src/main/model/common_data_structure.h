@@ -1,3 +1,6 @@
+#ifndef ADVANIEN_COMMON_DS
+#define ADVANIEN_COMMON_DS
+
 typedef struct {
 	unsigned short r;
 	unsigned short g;
@@ -14,3 +17,5 @@ typedef struct {
 	char name[400];
 	char* program_char;
 } kernel_program_map__ds;
+
+#endif
