@@ -35,6 +35,15 @@ int main()
 	content = file_char_content("main/kernel_lib/array_add.pc");
 	printf("File content: %s", content);
 
+	// simple immutable string
+	char* test_string = "This is very long long string for the test that it can be by default initialized and it is immutable"
+			"hence changing anything in the string will lead to segmentation. And this is just for test its behavior";
+	unit char_count = 0;
+	while(test_string[char_count] != "\0") {
+		printf("%c", test_string[char_count]);
+		char_count++;
+	}
+
 	// Testing common data
 	kernel_program_list_map_ds kernal_list_map;
 
