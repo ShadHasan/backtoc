@@ -28,7 +28,7 @@ char* file_char_content(char* file_path) {
 }
 
 
-uint file_char_content_return_length(char* file_path, char* final) {
+unsigned int file_char_content_return_length(char* file_path, char* final) {
 	FILE *fp;
 	uint file_char_counter = 0;
 	int c;
@@ -37,7 +37,7 @@ uint file_char_content_return_length(char* file_path, char* final) {
 		file_char_counter++;
 		final = incrementing_char(final, (char)c, file_char_counter);
 	}
-	return file_char_counter;
+	return (unsigned int)file_char_counter;
 }
 
 #endif

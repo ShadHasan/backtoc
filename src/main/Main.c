@@ -5,7 +5,8 @@
 #include "c_lib/math.h"
 #include "c_lib/math2.h"
 #include "utilities/fileIO.h"
-#include "kernel_program_map/map.h"
+
+// #include "kernel_program_map/map.h"
 
 
 int main()
@@ -32,11 +33,12 @@ int main()
 
 	// Testing fileIO Library
 	char* content;
-	content = file_char_content("main/kernel_lib/array_add.pc");
+	// Please keep in mind when file path providing to file_char_content is non existent will lead to as well segmentation fault;
+	content = file_char_content("main/kernel_program_lib/array_add.pc");
 	printf("File content: %s", content);
 
 	// simple immutable string
-	char test_string[] = "Thislong\n";
+	// char* test_string = "Thislong\n";
 
 	/* Too long string also cause segmentation fault
 	 * char* long_test_string = "This is very long long string for the test that it can be by default initialized and it is immutable";

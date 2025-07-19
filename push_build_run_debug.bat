@@ -10,7 +10,7 @@ rem .\binary\putty\PLINK.EXE %user%@%remotehost% -pw "%password%" -batch "cd %re
 
 .\binary\putty\PLINK.EXE %user%@%remotehost% -pw "%password%" -batch "cd %remotedir%/src ; gcc -Wall -Wextra -D CL_TARGET_OPENCL_VERSION=220 main/Main.c -o HelloOpenCL -lOpenCL -g;"
 
-.\binary\putty\PLINK.EXE %user%@%remotehost% -pw "%password%" -batch "cd %remotedir%/src ; ./HelloOpenCL;"
+.\binary\putty\PLINK.EXE %user%@%remotehost% -pw "%password%" -batch "cd %remotedir%/src ; chown root HelloOpenCL ; chgrp root HelloOpenCL ; ./HelloOpenCL;"
 
 echo 
 echo Execution completed
