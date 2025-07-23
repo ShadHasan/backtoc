@@ -2,7 +2,7 @@
 #include <CL/cl.h>
 
 
-function gpu_loader(cl_kernel kernel_libraries) {
+function gpu_loader(char* kernel_job_set) {
 	int verbose = 1; // to print error messages;
 
 	// selected GPU device, context and command queue;

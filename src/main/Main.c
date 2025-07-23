@@ -41,7 +41,7 @@ int main()
 	// char* test_string = "Thislong\n";
 
 
-	 char* test_string = "This is very long long string for the test that it can be by default initialized and it is immutable"
+	 char* test_string = "This is very long long string for the test that it can be by default initialized and it is immutable "
 			"hence changing anything in the string will lead to segmentation. And this is just for test its behavior";
 
 	unsigned int char_count = 0;
