@@ -16,5 +16,5 @@ function gpu_loader(char* kernel_job_set) {
 
 	// program and kernels;
 	cl_program program = NULL;
-	cl_kernel  kernelArrayADD = NULL;
+	cl_kernel*  program_list = NULL;
 }
