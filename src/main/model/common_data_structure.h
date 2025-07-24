@@ -1,13 +1,6 @@
 #ifndef ADVANIEN_COMMON_DS
 #define ADVANIEN_COMMON_DS
 
-typedef struct {
-	unsigned short r;
-	unsigned short g;
-	unsigned short b;
-} pixel;
-
-
 // It is kernel job set that is a name against the "programchar" which is a kernel function,
 // and kernel job set is the array/list of such function.
 typedef struct {

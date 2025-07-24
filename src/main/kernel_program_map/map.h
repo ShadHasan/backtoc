@@ -5,7 +5,14 @@
 #define ADVANIEN_KERNEL_PROGRAM_MAPPER
 
 
-bool _adv_contain(char* string, char c2){
+bool _adv_string_contain_char(char* string, char c2){
+	int i = 0;
+	while(string[i] == '\0'){
+		if(string[i] == c2) {
+			return true;
+		}
+		i++;
+	}
 	return false;
 }
 
@@ -18,9 +25,24 @@ void _adv_parse_map(char* content, unsigned int length) {
 	char literal_open_close = '"';
 
 	char* reserved_char = "{}[]\",";
+
+	// Three types of literal object key, object string, object array
+	char* literal_stack;
+
+
 	// ignoring leading and preceding space and newline
 	for (i = 0; i<length; i++) {
+		if (_adv_contain(reserved_char, content[i])) {
 
+		} else {
+			if (content[i] == ' ' || content[i] == '\n') {
+
+			} else {
+				if (content[i] == '"') {
+
+				}
+			}
+		}
 	}
 }
 
