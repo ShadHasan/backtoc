@@ -23,6 +23,8 @@ void _adv_parse_map(char* content, unsigned int length) {
 	char value_array_open = '[';
 	char value_array_close = ']';
 	char literal_open_close = '"';
+	// if value
+	char next_literal = ',';
 
 	char* reserved_char = "{}[]\",";
 
@@ -30,17 +32,18 @@ void _adv_parse_map(char* content, unsigned int length) {
 	char* literal_stack;
 
 
+	char* current_open_literal_type_stack;
+
+
 	// ignoring leading and preceding space and newline
 	for (i = 0; i<length; i++) {
 		if (_adv_contain(reserved_char, content[i])) {
-
+			// Trigger literal type
 		} else {
 			if (content[i] == ' ' || content[i] == '\n') {
 
 			} else {
-				if (content[i] == '"') {
 
-				}
 			}
 		}
 	}
