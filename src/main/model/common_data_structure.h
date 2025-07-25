@@ -20,7 +20,7 @@ typedef struct {
 } adv_parsed_program_object;
 
 
-// Dictionary entire data structure
+// Dictionary entire data structure with hierarchal
 typedef struct adv_key_value_obj adv_key_value_obj;
 
 typedef struct {
@@ -33,7 +33,7 @@ struct adv_key_value_obj {
 	char* type; // array, object, string
 	adv_key_value_obj* children;     // when type is object
 	adv_key_value_array* value_list; // when type is array
-	char* value; // when type is array
+	char* value; // when type is string
 };
 
 typedef struct {
