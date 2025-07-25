@@ -28,3 +28,4 @@ ubuntu@ubuntu:/usr/lib/aarch64-linux-gnu$ pwd
  
 Note: linking is different than including api of the library. One more thing that generall under /usr/lib or /usr/include is system
 path hence you don't need to use -L to explicitly specify the path of linker library. 
+

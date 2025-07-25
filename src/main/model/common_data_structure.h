@@ -20,26 +20,44 @@ typedef struct {
 } adv_parsed_program_object;
 
 
-// Dictionary entire data structure with hierarchal
-typedef struct adv_key_value_obj adv_key_value_obj;
+// Dictionary entire data structure with hierarchal. kv stands for key-value. Hence it is
+// like json datastructure
+typedef struct adv_kv_obj adv_kv_obj;
 
 typedef struct {
 	char** value;
 
-} adv_key_value_array;
+} adv_kv_array;
 
-struct adv_key_value_obj {
+struct adv_kv_obj {
 	char* key;
 	char* type; // array, object, string
-	adv_key_value_obj* children;     // when type is object
-	adv_key_value_array* value_list; // when type is array
+	adv_kv_obj* children;     // when type is object
+	adv_kv_array* value_list; // when type is array
 	char* value; // when type is string
 };
 
 typedef struct {
 	char* key = "root";
-	adv_key_value_obj* child;
-} adv_key_value_ds;
+	adv_kv_obj* child;
+} adv_kv;
 
+adv_kv adv_create_kv() {
+	adv_key_value obj;
+	obj.adv_key_value_obj = NULL;
+	return obj;
+}
+
+void adv_add_string_obj_kv(adv_kv kv, char* value) {
+	adv_key_value obj;
+	obj.adv_key_value_obj = NULL;
+	return obj;
+}
+
+void adv_add_array_obj_kv(adv_kv kv, char** value_list) {
+	adv_key_value obj;
+	obj.adv_key_value_obj = NULL;
+	return obj;
+}
 
 #endif
