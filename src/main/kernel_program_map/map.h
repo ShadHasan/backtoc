@@ -23,16 +23,16 @@ void _adv_parse_map(char* content, unsigned int length) {
 	char value_array_open = '[';
 	char value_array_close = ']';
 	char literal_open_close = '"';
+	char key_value_separator = ':';
+
 	// if value
 	char next_literal = ',';
-	char* reserved_char = "{}[]\",";
 
 	char* open_type_char = "{[\"";
 	char* close_type_char = "}]\"";
 
 	// Three types of literal object key, object string, object array
 	char* literal_stack;
-
 
 	char* open_type_stack;
 
