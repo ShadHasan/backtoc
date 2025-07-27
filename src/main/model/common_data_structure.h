@@ -34,8 +34,15 @@ struct adv_kv_array_ins_bp{
 	char* value;
 };
 
+// key list blueprint. It helps to keep track of used key. Hence used to prevent duplicate
+// key for data structure;
+typedef struct {
+	char* key;
+} key_list_bp;
+
 struct adv_kv_obj {
 	char* key;
+	key_list_bp* used_keys;
 	char* type; // array, object, string
 	adv_kv_obj children;     // when type is object
 	adv_kv_array* value_list; // when type is array, then again each element of array can be array, object, string
@@ -45,18 +52,30 @@ struct adv_kv_obj {
 typedef struct {
 	char* key = "root";
 	adv_kv_obj* child;
+	unsigned int child_count;
 } adv_kv;
 
-adv_kv adv_create_kv() {
+// Initialize key value derived data structure
+adv_kv adv_init_kv() {
 	adv_key_value obj;
 	obj.adv_key_value_obj = NULL;
 	return obj;
 }
 
-void adv_add_string_obj_kv(adv_kv kv, char* value) {
-	adv_key_value obj;
-	obj.adv_key_value_obj = NULL;
-	return obj;
+void adv_add_string_obj_kv(adv_kv* kv, char* key, char* value) {
+	adv_kv_obj obj;
+	obj.key = key;
+	obj.type = "string";
+	obj.value = value;
+	if (kv->adv_key_value_obj == NULL) {
+		kv->adv_key_value_obj = (adv_kv_obj*)malloc(sizeof(adv_kv_obj));
+		kv->child_count = 1;
+		kv->adv_key_value_obj[0] = obj;
+	} else {
+		kv->adv_key_value_obj = (adv_kv_obj*)realloc(kv->adv_key_value_obj, sizeof(adv_kv_obj)*(kv->child_count + 1));
+		kv->adv_key_value_obj[kv->child_count] = obj;
+		kv->child_count++;
+	}
 }
 
 void adv_add_array_obj_kv(adv_kv kv, char** value_list) {
