@@ -23,17 +23,17 @@ typedef struct {
 // Dictionary entire data structure with hierarchal. kv stands for key-value. Hence it is
 // like json datastructure
 typedef struct adv_kv_obj adv_kv_obj;
+typedef struct adv_kv_array adv_kv_array;
 
-typedef struct {
-	char** value;
-
-} adv_kv_array;
+struct adv_kv_array{
+	adv_kv_obj obj;
+};
 
 struct adv_kv_obj {
 	char* key;
 	char* type; // array, object, string
 	adv_kv_obj* children;     // when type is object
-	adv_kv_array* value_list; // when type is array
+	adv_kv_array* value_list; // when type is array, then again each element of array can be array, object, string
 	char* value; // when type is string
 };
 
