@@ -71,6 +71,9 @@ void adv_add_string_obj_kv(adv_kv* kv, char* key, char* value) {
 		kv->adv_key_value_obj = (adv_kv_obj*)malloc(sizeof(adv_kv_obj));
 		kv->child_count = 1;
 		kv->adv_key_value_obj[0] = obj;
+
+		kv->used_keys = (key_list_bp*)malloc(sizeof(key_list_bp));
+		kv->used_keys[0]
 	} else {
 		kv->adv_key_value_obj = (adv_kv_obj*)realloc(kv->adv_key_value_obj, sizeof(adv_kv_obj)*(kv->child_count + 1));
 		kv->adv_key_value_obj[kv->child_count] = obj;
