@@ -1,6 +1,7 @@
 // C standard includes
 #include <stdio.h>
 #include "utilities/opencl/platform.h"
+#include "model/2d_graph.h"
 #include "model/common_data_structure.h"
 #include "c_lib/math.h"
 #include "c_lib/math2.h"

@@ -1,5 +1,5 @@
-#include "../utilities/fileIO.h"
-#include "../model/common_data_structure.h"
+#include "utilities/fileIO.h"
+#include "model/common_data_structure.h"
 
 #ifndef ADVANIEN_KERNEL_PROGRAM_MAPPER
 #define ADVANIEN_KERNEL_PROGRAM_MAPPER
