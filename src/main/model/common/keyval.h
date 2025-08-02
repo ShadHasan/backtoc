@@ -1,7 +1,7 @@
 #ifndef ADVANIEN_COMMON_KEYVAL
 #define ADVANIEN_COMMON_KEYVAL
 
-// Dictionary entire data structure with hierarchal. kv stands for key-value. Hence it is
+// Dictionary entire data structure with hierarchical. "kv" stands for key-value. Hence it is
 // like json datastructure
 typedef struct adv_kv_obj adv_kv_obj;
 typedef struct adv_kv_array adv_kv_array;
