@@ -8,7 +8,7 @@ set remotedir=/home/%user%/temp_proj
 
 rem .\binary\putty\PLINK.EXE %user%@%remotehost% -pw "%password%" -batch "cd %remotedir%/src ; pwd; ls -l;"
 
-.\binary\putty\PLINK.EXE %user%@%remotehost% -pw "%password%" -batch "cd %remotedir%/src ; gcc -I %remotedir%/src/main -Wall -Wextra -D CL_TARGET_OPENCL_VERSION=220 main/Main.c -o HelloOpenCL -lOpenCL;"
+.\binary\putty\PLINK.EXE %user%@%remotehost% -pw "%password%" -batch "cd %remotedir%/src ; gcc -I %remotedir%/src/main -Wall -Wextra -D CL_TARGET_OPENCL_VERSION=210 main/Main.c -o HelloOpenCL -L/usr/lib/aarch64-linux-gnu/ -lOpenCL;"
 
 .\binary\putty\PLINK.EXE %user%@%remotehost% -pw "%password%" -batch "cd %remotedir%/src ; ./HelloOpenCL;"
 

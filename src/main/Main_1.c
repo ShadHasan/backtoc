@@ -6,7 +6,7 @@
 #include "c_lib/math.h"
 #include "c_lib/math2.h"
 #include "utilities/fileIO.h"
-#include "kernel_program_map/map.h"
+//#include "kernel_program_map/map.h"
 
 int main()
 {
