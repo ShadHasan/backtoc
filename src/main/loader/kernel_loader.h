@@ -66,7 +66,7 @@ char* sample_program() {
 "}";
 }
 
-int selectDevice(compute_context cctx) {
+int selectDevice(compute_context* cctx) {
 	unsigned int i, j;
 	cl_int ret;
 	cl_uint numPlatforms;
@@ -105,32 +105,32 @@ int selectDevice(compute_context cctx) {
  				if (debug.verbose) printf("Error clGetDeviceInfo() : %d\n", ret);
 				return ret;
 			}
-			printf("Preferred: %s, Found: %s-%d\n", cctx.devicename, local_dev_buf, strcmp(cctx.devicename, local_dev_buf));
-			if (cctx.devicename==NULL || strcmp(cctx.devicename, local_dev_buf) == 0) {
+			printf("Preferred: %s, Found: %s-%d\n", cctx->devicename, local_dev_buf, strcmp(cctx->devicename, local_dev_buf));
+			if (cctx->devicename==NULL || strcmp(cctx->devicename, local_dev_buf) == 0) {
          			ret = clGetDeviceInfo(devices[j],
                   			CL_DEVICE_MAX_WORK_ITEM_SIZES,
                    		 	sizeof(maxWItemSize3D), &maxWItemSize3D, NULL);
 
 				// set prefered local group size==maxWorkUnits;
-         		cctx.maxWorkUnits = (int)maxWItemSize3D[2];
-				cctx.deviceId = devices[j];
-				cctx.devicePlatform = platforms[i];
-				printf("Preferred: %s, Found_selected: %s device_count:%d, platform_count:%d\n", cctx.devicename, local_dev_buf, j, i);
+         		cctx->maxWorkUnits = (int)maxWItemSize3D[2];
+				cctx->deviceId = devices[j];
+				cctx->devicePlatform = platforms[i];
+				printf("Preferred: %s, Found_selected: %s device_count:%d, platform_count:%d\n", cctx->devicename, local_dev_buf, j, i);
 				return 0;
 			}
 		}
 	}
 	if (debug.verbose) {
-		if (cctx.devicename==NULL) {
+		if (cctx->devicename==NULL) {
 			printf("Error device not found.\n");
 		} else {
-			printf("Error device not found: %s\n", cctx.devicename);
+			printf("Error device not found: %s\n", cctx->devicename);
 		}
 	}
 	return -1;
 }
 
-int prepareProgramAndShadersWithData(compute_context cctx, char *programsource, program_context pctx) {
+int prepareProgramAndShadersWithData(compute_context* cctx, char *programsource, program_context* pctx) {
 	// calculate program source length;
 	int leng = 0;
 	while (true) {
@@ -144,27 +144,27 @@ int prepareProgramAndShadersWithData(compute_context cctx, char *programsource, 
 	int ret;
 
 	// create and build program;
-	pctx.program = clCreateProgramWithSource(cctx.context,
+	pctx->program = clCreateProgramWithSource(cctx->context,
 			1, (const char**)&programsource, &src_size, &ret);
 	if (CL_SUCCESS != ret) {
  		if (debug.verbose) printf("Error clCreateProgramWithSource() : %d\n", ret);
 		return ret;
 	}
-	ret = (int)clBuildProgram(pctx.program, 1, &cctx.deviceId, NULL, NULL, NULL);
+	ret = (int)clBuildProgram(pctx->program, 1, &cctx->deviceId, NULL, NULL, NULL);
 	if (CL_SUCCESS != ret) {
  		if (debug.verbose) printf("Error clBuildProgram() : %d\n", ret);
 		return ret;
 	}
 
 	// create first kernel;
-	pctx.kernelArrayADD = clCreateKernel(pctx.program, "ArrayADD", &ret);
+	pctx->kernelArrayADD = clCreateKernel(pctx->program, "ArrayADD", &ret);
 	if (CL_SUCCESS != ret) {
  		if (debug.verbose) printf("Error clCreateKernel() : %d\n", ret);
 		return ret;
 	}
 
 	// create second kernel;
-	pctx.kernelArraySUM = clCreateKernel(pctx.program, "ArraySUM", &ret);
+	pctx->kernelArraySUM = clCreateKernel(pctx->program, "ArraySUM", &ret);
 	if (CL_SUCCESS != ret) {
  		if (debug.verbose) printf("Error clCreateKernel() : %d\n", ret);
 		return ret;
@@ -173,29 +173,29 @@ int prepareProgramAndShadersWithData(compute_context cctx, char *programsource, 
 	return 0;
 }
 
-int createConextAndCommandQueue(compute_context cctx) {
+int createConextAndCommandQueue(compute_context* cctx) {
 	int ret;
 	char local_dev_buf[240];
 
-	ret = clGetDeviceInfo(cctx.deviceId, CL_DEVICE_NAME,
+	ret = clGetDeviceInfo(cctx->deviceId, CL_DEVICE_NAME,
 					sizeof(local_dev_buf), local_dev_buf, NULL);
-	printf("Creating command queue with: %s", local_dev_buf);
+	printf("Creating command queue with: %s\n", local_dev_buf);
 
 	// create context;
 	cl_context_properties props[3];
 	props[0] = CL_CONTEXT_PLATFORM;
-	props[1] = (cl_context_properties)cctx.devicePlatform;
+	props[1] = (cl_context_properties)cctx->devicePlatform;
 	props[2] = 0;
-	cctx.context = clCreateContext(props, 1, &cctx.deviceId, NULL, NULL, &ret);
+	cctx->context = clCreateContext(props, 1, &cctx->deviceId, NULL, NULL, &ret);
 	if (CL_SUCCESS != ret) {
  		if (debug.verbose) printf("Error clCreateContext() : %d\n", ret);
 		return ret;
 	}
 	// create command queue;
 	#if CL_TARGET_OPENCL_VERSION >= 300
-		cctx.commandQueue = clCreateCommandQueueWithProperties(cctx.context, cctx.deviceId, NULL, &ret);
+		cctx->commandQueue = clCreateCommandQueueWithProperties(cctx->context, cctx->deviceId, NULL, &ret);
 	#else
-		cctx.commandQueue = clCreateCommandQueue(cctx.context, cctx.deviceId, 0, &ret);
+		cctx->commandQueue = clCreateCommandQueue(cctx->context, cctx->deviceId, 0, &ret);
 	#endif
 	if (CL_SUCCESS != ret) {
  		if (debug.verbose)
@@ -244,9 +244,9 @@ void gpu_loader() {
 			input2[i*hgt + j] = 5.00;
 		}
 	}
-	selectDevice(c_ctx);
-	createConextAndCommandQueue(c_ctx);
-	prepareProgramAndShadersWithData(c_ctx, programchar, p_ctx);
+	selectDevice(&c_ctx);
+	createConextAndCommandQueue(&c_ctx);
+	prepareProgramAndShadersWithData(&c_ctx, programchar, &p_ctx);
 
 	// create GPU memory array blocks with initial input data.
 	// this will copy input1 and input2 data into GPU memory blocks.
