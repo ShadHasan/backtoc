@@ -27,9 +27,11 @@ typedef struct {
 // to print error messages;
 DEBUG debug;
 
+
+// ArrayADD: compute element-wise sums of INPUT1 and INPUT2;
+// ArraySUM: compute row-wise sums of INPUT;
 char* sample_program() {
-	return "// compute element-wise sums of INPUT1 and INPUT2;"
-"__kernel void ArrayADD ("
+	return "__kernel void ArrayADD ("
 "	int  wid,"
 "	int  hgt,"
 "	__global float *INPUT1,"
@@ -37,14 +39,14 @@ char* sample_program() {
 "	__global float *OUTPUT"
 ") {"
 "	int totalwork = wid * hgt;"
-"	int peIndex = get_global_id(0); // get process element index ID"
-"	if (peIndex >= totalwork) { // to filter extras"
+"	int peIndex = get_global_id(0); "
+"	if (peIndex >= totalwork) { "
 "		return;"
 "	}"
 "	OUTPUT[peIndex] = INPUT1[peIndex] + INPUT2[peIndex];"
 "}"
 ""
-"// compute row-wise sums of INPUT;"
+""
 "__kernel void ArraySUM ("
 "	int  wid,"
 "	int  hgt,"
@@ -52,14 +54,14 @@ char* sample_program() {
 "	__global float *OUTPUT"
 ") {"
 "	int totalwork = hgt;"
-"	int peIndex = get_global_id(0); // get process element index ID"
-"	if (peIndex >= totalwork) { // to filter extras"
+"	int peIndex = get_global_id(0);"
+"	if (peIndex >= totalwork) {"
 "		return;"
 "	}"
 "	int i, startindex;"
 "	float sum = 0.0f;"
 "	startindex = wid * peIndex;"
-"	for (i = 0; i < wid; i++) { // compute the sum of the row;"
+"	for (i = 0; i < wid; i++) {"
 "		sum += INPUT[startindex + i];"
 "	}"
 "	OUTPUT[peIndex] = sum;"
@@ -143,6 +145,8 @@ int prepareProgramAndShadersWithData(compute_context* cctx, char *programsource,
 	size_t src_size = leng;
 	int ret;
 
+	if (debug.verbose) printf("Program: %s\n", programsource);
+
 	// create and build program;
 	pctx->program = clCreateProgramWithSource(cctx->context,
 			1, (const char**)&programsource, &src_size, &ret);
@@ -150,9 +154,38 @@ int prepareProgramAndShadersWithData(compute_context* cctx, char *programsource,
  		if (debug.verbose) printf("Error clCreateProgramWithSource() : %d\n", ret);
 		return ret;
 	}
+
+
 	ret = (int)clBuildProgram(pctx->program, 1, &cctx->deviceId, NULL, NULL, NULL);
 	if (CL_SUCCESS != ret) {
- 		if (debug.verbose) printf("Error clBuildProgram() : %d\n", ret);
+ 		if (debug.verbose) {
+
+			printf("Error clBuildProgram() : %d\n", ret);
+
+			// Debugging build failure
+			char *buff_erro;
+			cl_int errcode;
+			size_t build_log_len;
+			errcode = clGetProgramBuildInfo(pctx->program, cctx->deviceId, CL_PROGRAM_BUILD_LOG, 0, NULL, &build_log_len);
+			if (errcode) {
+					printf("clGetProgramBuildInfo failed at line %d\n", __LINE__);
+					exit(-1);
+			}
+
+			buff_erro = malloc(build_log_len);
+			if (!buff_erro) {
+				printf("malloc failed at line %d\n", __LINE__);
+				exit(-2);
+			}
+
+			errcode = clGetProgramBuildInfo(pctx->program, cctx->deviceId, CL_PROGRAM_BUILD_LOG, build_log_len, buff_erro, NULL);
+			if (errcode) {
+				printf("clGetProgramBuildInfo failed at line %d\n", __LINE__);
+				exit(-3);
+			}
+
+			printf("Build log: \n%s\n", buff_erro);
+ 		}
 		return ret;
 	}
 
@@ -351,6 +384,7 @@ void gpu_loader() {
 	for (j = 0; j < hgt; j++) {
 		printf("%f -> ", output[j]);
 	}
+
 
 }
 
