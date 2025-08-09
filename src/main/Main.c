@@ -6,7 +6,7 @@
 #include "c_lib/math.h"
 #include "c_lib/math2.h"
 #include "utilities/fileIO.h"
-#include "model/keyval.h"
+#include "model/common/keyval.h"
 //#include "kernel_program_map/map.h"
 
 int main()
@@ -51,7 +51,7 @@ int main()
 	}
 
 	// Testing common data
-
+	adv_kv_obj* kv1 = adv_init_kv(1);
 
 
 	// kernel_program_list_map_ds kernal_list_map;

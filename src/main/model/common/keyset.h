@@ -1,5 +1,5 @@
-#ifndef ADVANIEN_COMMON_KEYVAL
-#define ADVANIEN_COMMON_KEYVAL
+#ifndef ADVANIEN_COMMON_KEYSET
+#define ADVANIEN_COMMON_KEYSET
 
 #include <stdlib.h>
 #include <string.h>
@@ -14,7 +14,7 @@ struct adv_l_key_set {
         adv_l_key_set* next;
 };
 
-void adv_init_lks(l_key_set* lks) {
+void adv_init_lks(adv_l_key_set* lks) {
         lks->str = "(.)";
         lks->next = NULL;
 }
@@ -39,7 +39,6 @@ void adv_add_key_lks(adv_l_key_set* lks, char* str) {
 }
 
 void adv_del_key_lks(adv_l_key_set* lks, char* str) {
-	adv_l_key_set* root = lks;
 	adv_l_key_set* prev = lks;
 	lks = lks->next;
 	while (lks != NULL) {
