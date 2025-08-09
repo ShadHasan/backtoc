@@ -3,6 +3,7 @@
 
 #include <stdlib.h>
 #include "model/common/keyval.h"
+#include <string.h>
 
 // Dictionary entire data structure with hierarchical. "kv" stands for key-value. Hence it is
 
@@ -36,7 +37,7 @@ struct adv_kv_obj {
 
 
 // Initialize key value derived data structure
-adv_kv adv_init_kv() {
+adv_kv_array adv_init_kv(char* type) {
 	// Root object
 	adv_kv_obj obj;
 
@@ -48,7 +49,7 @@ adv_kv adv_init_kv() {
 
 	// root keyval is alway of type object. It value may be array, object, string etc
 	// but root itself is a object
-	obj.type = "object";
+	strcpy(obj.type, type);
 
 	obj.children = NULL;
 	obj.value_list = NULL;
@@ -57,8 +58,10 @@ adv_kv adv_init_kv() {
 	return obj;
 }
 
-void adv_kv_obj(adv_kv* kv, char* key, char* value) {
-	adv_kv_obj obj;
+/// This is all when root kv is of object type
+void add_obj_to_adv_kv_obj(adv_kv* kv, char* key, char* value) {
+	adv_kv_obj* obj;
+	obj = (adv_kv_obj*)malloc(sizeof(adv_kv_obj));
 	obj.key = key;
 	obj.type = "string";
 	obj.value = value;
@@ -76,10 +79,36 @@ void adv_kv_obj(adv_kv* kv, char* key, char* value) {
 	}
 }
 
-void adv_add_array_obj_kv(adv_kv kv, char** value_list) {
-	adv_key_value obj;
-	obj.adv_key_value_obj = NULL;
-	return obj;
+void add_str_to_adv_kv_obj(adv_kv* kv, char* key, char* value) {
+
 }
+
+void add_arr_to_adv_kv_obj(adv_kv* kv, char* key, adv_kv_array* arr) {
+
+}
+
+
+// This is the end  when root kv is of object type
+
+/// This is all when root kv is of array type
+
+// This is the end  when root kv is of array type
+
+
+/// This is all when adding element to array type "kv"
+void add_str_array_to_adv_kv_obj(adv_kv* kv, char* type, char* value) {
+
+}
+
+// this is nested array
+void add_array_array_to_adv_kv_obj(adv_kv* kv, char* type, adv_kv_array* arr) {
+
+}
+
+void add_object_array_to_adv_kv_obj(adv_kv kv, char* type, adv_kv_obj* obj) {
+
+}
+
+// This is the end of adding element when "kv" is of array type
 
 #endif
