@@ -1,49 +1,63 @@
 #ifndef ADVANIEN_COMMON_KEYVAL
 #define ADVANIEN_COMMON_KEYVAL
 
+#include <stdlib.h>
+#include "model/common/keyval.h"
+
 // Dictionary entire data structure with hierarchical. "kv" stands for key-value. Hence it is
+
 // like json datastructure
 typedef struct adv_kv_obj adv_kv_obj;
 typedef struct adv_kv_array adv_kv_array;
 
 // array each instance blueprint
 // please note array can have nested array
-struct adv_kv_array_ins_bp{
+struct adv_kv_array{
 	char* type; // array, object, string
 	adv_kv_obj obj;
 	adv_kv_array* value_list;
 	char* value;
 };
 
-// key list blueprint. It helps to keep track of used key. Hence used to prevent duplicate
-// key for data structure;
-typedef struct {
-	char* key;
-} key_list_bp;
 
 struct adv_kv_obj {
 	char* key;
-	key_list_bp* used_keys;
+
+	// key list blueprint. It helps to keep track of used key. Hence used to prevent duplicate
+	// key for data structure
+	adv_l_key_set* used_keys;
+
 	char* type; // array, object, string
-	adv_kv_obj children;     // when type is object
+
+	adv_kv_obj* children;     // when type is object
 	adv_kv_array* value_list; // when type is array, then again each element of array can be array, object, string
 	char* value; // when type is string
 };
 
-typedef struct {
-	char* key = "root";
-	adv_kv_obj* child;
-	unsigned int child_count;
-} adv_kv;
 
 // Initialize key value derived data structure
 adv_kv adv_init_kv() {
-	adv_key_value obj;
-	obj.adv_key_value_obj = NULL;
+	// Root object
+	adv_kv_obj obj;
+
+	// initializing root key
+	obj.key = "(0)";
+	obj.used_keys = (adv_l_key_set*)malloc(sizeof(adv_l_key_set));
+	adv_init_lks(obj.used_keys);
+	adv_add_key_lks(obj.used_keys, obj.key);
+
+	// root keyval is alway of type object. It value may be array, object, string etc
+	// but root itself is a object
+	obj.type = "object";
+
+	obj.children = NULL;
+	obj.value_list = NULL;
+	obj.value = NULL;
+
 	return obj;
 }
 
-void adv_add_string_obj_kv(adv_kv* kv, char* key, char* value) {
+void adv_kv_obj(adv_kv* kv, char* key, char* value) {
 	adv_kv_obj obj;
 	obj.key = key;
 	obj.type = "string";
