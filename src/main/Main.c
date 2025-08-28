@@ -50,8 +50,11 @@ int main()
 		char_count++;
 	}
 
-	// Testing common data
+	// initializing keyvalue, 1 mean object, 0 mean array
+	// you cannot initialize as string
 	adv_kv_obj* kv1 = adv_init_kv(1);
+
+
 
 
 	// kernel_program_list_map_ds kernal_list_map;

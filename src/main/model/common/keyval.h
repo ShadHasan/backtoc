@@ -11,49 +11,47 @@
 typedef struct adv_kv_obj adv_kv_obj;
 typedef struct adv_kv_array adv_kv_array;
 
+
 // array each instance blueprint
 // please note array can have nested array
 struct adv_kv_array{
 	short type; // array 0, object 1, string 2
-	adv_kv_obj* obj;
-	adv_kv_array* value_list;
-	char* value;
+	adv_kv_obj** obj;
+	adv_kv_array** value_list;
+	char** value;
 };
 
 
 struct adv_kv_obj {
-	char* key;
-
-	// key list blueprint. It helps to keep track of used key. Hence used to prevent duplicate
-	// key for data structure
-	adv_l_key_set* used_keys;
+	// key list blueprint. It helps to keep track of used key.
+	// Hence used to prevent duplicate key for data structure
+	adv_l_key_set* keys;
 
 	short type; // array 0, object 1, string 2
 
-	adv_kv_obj* children;     // when type is object
-	adv_kv_array* value_list; // when type is array, then again each element of array can be array, object, string
-	char* value; // when type is string
+	adv_kv_obj** children;     // when type is object
+	adv_kv_array** value_list; // when type is array, then again each element of array can be array, object, string
+	char** value; // when type is string
 };
 
 
 // Initialize key value as a root element
+// root keyval is alway of type object. It value may be array, object, string etc
+// but root itself is a object
 adv_kv_obj* adv_init_kv(int type) {
+	// type can be array 0, object 1 even though string is 2,
+	// we cannot initialized with string hence other than 0, 1 will return NULL
+	if (type <0 && type > 1) {
+		return NULL;
+	}
+
 	// Root object
 	adv_kv_obj* obj = (adv_kv_obj*)malloc(sizeof(adv_kv_obj));
 
-	// initializing root key
-	obj->key = "(0)";
-	obj->used_keys = (adv_l_key_set*)malloc(sizeof(adv_l_key_set));
-	adv_init_lks(obj->used_keys);
-	adv_add_key_lks(obj->used_keys, obj->key);
-
-	// If type is not array 0, object 1, string 2  then return NULL
-	if (type <0 && type > 2) {
-		return NULL;
-	}
-	// root keyval is alway of type object. It value may be array, object, string etc
-	// but root itself is a object
-	obj->type = type;
+	// initializing root key with given type
+	obj->keys = (adv_l_key_set*)malloc(sizeof(adv_l_key_set));
+	adv_init_lks(obj->keys);
+	adv_add_key_with_attr_lks(obj->keys,"(0)", type, 0);
 
 	obj->children = NULL;
 	obj->value_list = NULL;
@@ -64,7 +62,10 @@ adv_kv_obj* adv_init_kv(int type) {
 
 /// This is all when root kv is of object type
 void add_obj_to_adv_kv_obj(adv_kv_obj* kv, char* key, adv_kv_obj* obj) {
-
+	int index = adv_index_key_lks(kv->keys, key);
+	if (index < 0) {
+		adv_add_key_lks(obj->keys, key);
+	}
 }
 
 void add_str_to_adv_kv_obj(adv_kv_obj* kv, char* key, char* value) {

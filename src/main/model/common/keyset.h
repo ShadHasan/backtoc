@@ -11,6 +11,8 @@ typedef struct adv_l_key_set adv_l_key_set;
 
 struct adv_l_key_set {
         char* str;
+        int attr1;      // This is used to defined type for key-val
+        int attr2;     // This basically hold index, again some extra attribute
         adv_l_key_set* next;
 };
 
@@ -24,6 +26,27 @@ void adv_add_key_lks(adv_l_key_set* lks, char* str) {
 	adv_l_key_set* t_lks;
 	t_lks = (adv_l_key_set*)malloc(sizeof(adv_l_key_set));
 	t_lks->str = str;
+	t_lks->next = NULL;
+	bool ignore = false;
+	while(lks->next != NULL) {
+		if (strcmp(lks->next->str, str) == 0) {
+			ignore = true;
+			break;
+		}
+		lks = lks->next;
+	}
+	if (!ignore) {
+		lks->next = t_lks;
+	}
+}
+
+void adv_add_key_with_attr_lks(adv_l_key_set* lks, char* str, int attr1, int attr2) {
+
+	adv_l_key_set* t_lks;
+	t_lks = (adv_l_key_set*)malloc(sizeof(adv_l_key_set));
+	t_lks->str = str;
+	t_lks->attr1 = attr1;
+	t_lks->attr2 = attr2;
 	t_lks->next = NULL;
 	bool ignore = false;
 	while(lks->next != NULL) {
