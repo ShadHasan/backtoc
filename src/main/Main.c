@@ -58,8 +58,12 @@ int main()
 	char c;
 
 
+	/*
 	// Verify stack feature
-	adv_char_stack* c_stack = init_adv_char_stack('f');
+	adv_char_stack* c_stack;// = init_adv_char_stack('f');
+	c_stack->c = NULL;
+	c_stack->size = 0;
+	push_adv_char_stack(c_stack, 'f');
 	push_adv_char_stack(c_stack, 'i');
 	push_adv_char_stack(c_stack, 'r');
 	c = seek_adv_char_stack(c_stack);
@@ -76,10 +80,14 @@ int main()
 		c = pop_adv_char_stack(c_stack);
 		printf("\n pop stack: %c \n",c);
 	}
+	*/
 
 	// kernel_program_list_map_ds kernal_list_map;
 
 	// Testing kernel map loading
+
+	// testing
+	json_test();
 
     return 0;
 }

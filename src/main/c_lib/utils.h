@@ -18,15 +18,20 @@ void tstring(char* ts, char c) {
 }
 
 bool validate_json(char* json_str){
+	bool invalid = false;
+	/*
 	int len = strlen(json_str);
+
 	char c, poped_c;
 	bool isKey = true;
 
 	short type;  // array 0, object 1, string 2
 	char* ts = NULL;
-	adv_char_stack* c_stack = init_adv_char_stack('');
+	adv_char_stack* c_stack;
+	c_stack->c = NULL;
+	c_stack->size = 0;
 	int i;
-	bool invalid = false;
+
 	for(i=0;i<len;i++) {
 		c = seek_adv_char_stack(c_stack);
 		switch(json_str[i]) {
@@ -90,6 +95,8 @@ bool validate_json(char* json_str){
 			break;
 		}
 	}
+	*/
+	return invalid;
 }
 
 #endif
