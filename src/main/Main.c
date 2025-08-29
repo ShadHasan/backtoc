@@ -66,7 +66,15 @@ int main()
 	c = pop_adv_char_stack(c_stack);
 	printf("\n pop stack: %c \n",c);
 	c = seek_adv_char_stack(c_stack);
-	printf("\n seek stack: %c \n",c);
+	printf("\n %c \n",c);
+	push_adv_char_stack(c_stack, 'r');
+	push_adv_char_stack(c_stack, 's');
+	push_adv_char_stack(c_stack, 't');
+
+	while(c_stack->size > 0) {
+		c = pop_adv_char_stack(c_stack);
+		printf("\n pop stack: %c \n",c);
+	}
 
 	// kernel_program_list_map_ds kernal_list_map;
 
