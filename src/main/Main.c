@@ -51,6 +51,7 @@ int main()
 		printf("%c", test_string[char_count]);
 		char_count++;
 	}
+	printf("\n");
 
 	// initializing keyvalue, 1 mean object, 0 mean array
 	// you cannot initialize as string

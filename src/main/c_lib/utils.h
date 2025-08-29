@@ -6,11 +6,12 @@
 #include "model/common/stack.h"
 
 void tstring(char* ts, char c) {
-	int len = strlen(ts);
+
 	if (ts == NULL) {
 		ts = (char*)malloc(sizeof(char));
 		ts[0] = c;
 	} else {
+		int len = strlen(ts);
 		ts = (char*)realloc(ts, (len+1)*sizeof(char));
 		ts[len] = c;
 	}
@@ -29,11 +30,17 @@ bool validate_json(char* json_str){
 
 	char* ts = NULL;
 
-	struct adv_char_stack* c_stack = {NULL, 0};
-
-	/*
+	adv_char_stack* c_stack = malloc(sizeof(adv_char_stack));
+	c_stack->c = NULL;
+	c_stack->size = 0;
+	printf("%d", c_stack->size);
 	for(i=0;i<len;i++) {
-		c = seek_adv_char_stack(c_stack);
+
+		if (c_stack->size > 0)
+			c = seek_adv_char_stack(c_stack);
+		else
+			c = '*';
+
 		switch(json_str[i]) {
 			case '{':
 				if (c != '"') {
@@ -91,11 +98,12 @@ bool validate_json(char* json_str){
 				}
 				break;
 		}
+
 		if (invalid) {
 			break;
 		}
 	}
-	*/
+
 	return invalid;
 }
 
