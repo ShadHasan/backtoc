@@ -104,7 +104,7 @@ bool validate_json(char* json_str){
 		}
 	}
 
-	return invalid;
+	return (!invalid);
 }
 
 #endif
