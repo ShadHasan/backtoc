@@ -21,6 +21,8 @@ bool validate_json(char* json_str){
 	int len = strlen(json_str);
 	char c, poped_c;
 	bool isKey = true;
+
+	short type;  // array 0, object 1, string 2
 	char* ts = NULL;
 	adv_char_stack* c_stack = init_adv_char_stack('');
 	int i;
@@ -59,14 +61,23 @@ bool validate_json(char* json_str){
 					poped_c = pop_adv_char_stack(c_stack);
 				}
 				break;
-			case ':':    // Time to separate key and its value
-				if (c != '"') {
-					isKey = false;
+			case ':':    // Time to separate key from its value
+				if(!isKey) {
+					invalid = true; // value do not have followed value, only key have value.
+				} else {
+					if (c != '"') {
+						isKey = false;
+					} else {
+						if (c == '[') {   // if c is array it does not expect semicolon
+							invalid = true;
+						}
+					}
 				}
 				break;
 			case ',':
 				if (c != '"') {
-					isKey = true;
+					if (c == '{')
+						isKey = true;
 				}
 				break;
 			default:
