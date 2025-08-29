@@ -8,6 +8,7 @@
 #include "utilities/fileIO.h"
 #include "model/common/keyval.h"
 #include "model/common/stack.h"
+#include "test/utils_test.c"
 //#include "kernel_program_map/map.h"
 
 int main()
