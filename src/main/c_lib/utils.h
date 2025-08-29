@@ -57,6 +57,7 @@ bool validate_json(char* json_str){
 					push_adv_char_stack(c_stack, '"');
 				} else {
 					poped_c = pop_adv_char_stack(c_stack);
+					// here get the key in ts if isKey "true" else value
 				}
 				break;
 			case '}':
@@ -67,7 +68,7 @@ bool validate_json(char* json_str){
 				}
 				break;
 			case ']':
-				if (c != ']') {
+				if (c != '[') {
 					invalid = true;
 				} else {
 					poped_c = pop_adv_char_stack(c_stack);
@@ -100,6 +101,7 @@ bool validate_json(char* json_str){
 		}
 
 		if (invalid) {
+			printf("\n Error at char: %c, index: %d\n", json_str[i], i);
 			break;
 		}
 	}

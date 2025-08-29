@@ -4,7 +4,7 @@
 #include "c_lib/utils.h"
 
 int json_test() {
-	char* jsonstr = "{\"key\": \"value\"}";
+	char* jsonstr = "{\"key\": \"value\", \"key2\": [], \"key3\": {}}";
 	/*
 	int len = strlen(jsonstr);
 	int i;
