@@ -22,6 +22,7 @@ adv_char_stack* init_adv_char_stack(char c) {
 void push_adv_char_stack(adv_char_stack* stack, char c) {
 	if (stack->c == NULL) {
 		stack->c = (char*)malloc(sizeof(char));
+		stack->size = 0;
 	} else {
 		stack->c = (char*)realloc(stack->c, (stack->size+1)*sizeof(char));
 	}
