@@ -6,36 +6,32 @@
 typedef struct adv_char_stack adv_char_stack;
 
 struct adv_char_stack {
-	char c;
-	adv_char_stack* next;
-	adv_char_stack* prev;
+	char* c;
+	int size;
 };
 
 adv_char_stack* init_adv_char_stack(char c) {
-	adv_char_stack* stack = (adv_char_stack*)malloc(sizeof(adv_char_stack));
-	stack->c = c;
-	stack->next = NULL;
-	stack->prev = NULL;
+	adv_char_stack* stack;
+	stack->size = 0;
+	stack->c = (char*)malloc(sizeof(char));
+	stack->c[0] = c;
+	stack->size++;
 	return stack;
 }
 
 void push_adv_char_stack(adv_char_stack* stack, char c) {
-	adv_char_stack* nstack = (adv_char_stack*)malloc(sizeof(adv_char_stack));
-	nstack->c = stack->c;
-	stack->c = c;
-	nstack->next = NULL;
-	stack->next = nstack;
+	stack->c = (char*)realloc(stack->c, (stack->size+1)*sizeof(char));
+	stack->c[stack->size++] = c;
 }
 
 char seek_adv_char_stack(adv_char_stack* stack) {
-	return stack->c;
+	return stack->c[stack->size-1];
 }
 
 char pop_adv_char_stack(adv_char_stack* stack) {
-	adv_char_stack* rstack = stack->next;
-	char c = stack->c;
-	free(stack);
-	stack = rstack;
+	char c = stack->c[(stack->size-1)];
+	stack->c = (char*)realloc(stack->c, (stack->size-1)*sizeof(char));
+	stack->size--;
 	return c;
 }
 
