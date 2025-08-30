@@ -37,6 +37,7 @@ bool validate_json(char* json_str){
 	char c, poped_c;
 	bool isKey = true;
 	short type;  // array 0, object 1, string 2
+	int depth = 0;   // count level of depth
 
 	char* ts = (char*)malloc(sizeof(char));
 	ts[0] = '\0';
@@ -58,6 +59,7 @@ bool validate_json(char* json_str){
 					push_adv_char_stack(c_stack, '{');
 					isKey = true;
 					// TODO: Here initialize kv object
+					depth++;
 				}
 				break;
 			case '[':
@@ -65,6 +67,7 @@ bool validate_json(char* json_str){
 					push_adv_char_stack(c_stack, '[');
 					// TODO: here initialize new kv array
 					isKey = false;
+					depth++;
 				}
 				break;
 			case '"':
@@ -83,6 +86,7 @@ bool validate_json(char* json_str){
 						poped_c = pop_adv_char_stack(c_stack);
 						// Todo: here link kv object to predecessor
 						free_tstring(ts);
+						depth--;
 					}
 				}
 				break;
@@ -94,6 +98,7 @@ bool validate_json(char* json_str){
 						poped_c = pop_adv_char_stack(c_stack);
 						// Todo: here link kv array to predecessor
 						free_tstring(ts);
+						depth--;
 					}
 				}
 				break;
