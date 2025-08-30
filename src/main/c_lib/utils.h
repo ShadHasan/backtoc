@@ -5,6 +5,14 @@
 #include <string.h>
 #include "model/common/stack.h"
 
+typedef adv_depth adv_depth;
+
+struct adv_depth {
+	int current_depth;
+	int* depth_element_count;
+	int allocated;
+};
+
 void tstring(char* ts, char c) {
 	int len = strlen(ts);
 	if (len <= 0) {
@@ -28,13 +36,18 @@ void free_tstring(char* ts) {
 	ts[0] = '\0';
 }
 
-void increment_depth_element(int* depth_trace, int depth) {
-
+void increment_depth_element(adv_depth* depth_trace, int depth) {
+	if(depth > depth_trace->allocated) {
+		depth_trace->depth_element_count = (int*)realloc(depth_trace->depth_element_count, (++depth_trace->allocated)*sizeof(int));
+	}
+	depth_trace->depth_element_count[depth]++;
 }
 
-void decrement_depth_element(int* depth_trace, int depth){
-
+void reset_depth_element(adv_depth* depth_trace, int depth){
+	depth_trace->depth_element_count[depth] = 0;
 }
+
+
 
 bool validate_json(char* json_str){
 	bool invalid = false;
@@ -45,8 +58,14 @@ bool validate_json(char* json_str){
 	char c, poped_c;
 	bool isKey = true;
 	short type;  // array 0, object 1, string 2
-	int current_depth = 0;   // current level of depth in json tree
-	int* depth_element_count = (int*)malloc(sizeof(int));
+
+	// current level of depth which is root represent
+	// as 0 in json tree which have only one element
+	adv_depth *depth = malloc(sizeof(_depth));
+	depth->current_depth = 0;
+	depth->allocated = 1;
+	depth->depth_element_count = (int*)malloc(sizeof(int));
+	depth->depth_element_count[0] = 1
 
 	char* ts = (char*)malloc(sizeof(char));
 	ts[0] = '\0';
@@ -68,7 +87,7 @@ bool validate_json(char* json_str){
 					push_adv_char_stack(c_stack, '{');
 					isKey = true;
 					// TODO: Here initialize kv object
-					current_depth++;
+					depth->current_depth++;
 				}
 				break;
 			case '[':
@@ -76,7 +95,7 @@ bool validate_json(char* json_str){
 					push_adv_char_stack(c_stack, '[');
 					// TODO: here initialize new kv array
 					isKey = false;
-					current_depth++;
+					depth->current_depth++;
 				}
 				break;
 			case '"':
@@ -85,6 +104,13 @@ bool validate_json(char* json_str){
 				} else {
 					poped_c = pop_adv_char_stack(c_stack);
 					// here get the key in ts if isKey "true" else value
+					switch(c) {
+						case '{':
+
+							break;
+						case '[':
+							break;
+					}
 				}
 				break;
 			case '}':
@@ -95,7 +121,7 @@ bool validate_json(char* json_str){
 						poped_c = pop_adv_char_stack(c_stack);
 						// Todo: here link kv object to predecessor
 						free_tstring(ts);
-						current_depth--;
+						depth->current_depth--;
 					}
 				}
 				break;
@@ -107,7 +133,7 @@ bool validate_json(char* json_str){
 						poped_c = pop_adv_char_stack(c_stack);
 						// Todo: here link kv array to predecessor
 						free_tstring(ts);
-						current_depth--;
+						depth->current_depth--;
 					}
 				}
 				break;
