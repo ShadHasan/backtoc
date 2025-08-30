@@ -5,6 +5,15 @@
 
 int json_test() {
 	char* jsonstr = "{\"key\": \"value\", \"key2\": [], \"key3\": {}}";
+	char* jsonstr1 = "{\"key\": \"value\", \"key2\": [], \"key3\": {{}}";
+	char* jsonstr2 = "{\"key\": \"value\", \"key2\": [], \"key3\": {}}}";
+	char* jsonstr3 = "{";
+	char* jsonstr4 = "";
+	char* jsonst5 = "{}";
+	char* jsonstr6 = "}";
+	char* jsonstr7 = "[";
+	char* jsonstr8 = "[]";
+	char* jsonstr9 = "]";
 	/*
 	int len = strlen(jsonstr);
 	int i;
@@ -15,11 +24,11 @@ int json_test() {
 	}
 	printf("\n");
 	*/
-	bool valid = validate_json(jsonstr);
+	bool valid = validate_json(jsonstr1);
 	if (valid) {
-		printf("Valid json");
+		printf("\nValid json");
 	} else {
-		printf("Not valid json");
+		printf("\nNot valid json");
 	}
 	return 0;
 }

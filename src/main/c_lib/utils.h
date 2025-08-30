@@ -78,17 +78,17 @@ bool validate_json(char* json_str){
 				if(!isKey) {
 					invalid = true; // value do not have followed value, only key have value.
 				} else {
-					if (c != '"') {
+					if (c != '"') {  // if " is not on top of stack. It is not string literal but json syntax and it is key but value.
 						isKey = false;
 					} else {
-						if (c == '[') {   // if c is array it does not expect semicolon
+						if (c == '[') {   // if c is [(array) it does not expect semicolon
 							invalid = true;
 						}
 					}
 				}
 				break;
 			case ',':
-				if (c != '"') {
+				if (c != '"') {  // if " is not otos. It is not string literal but json syntax and it is either next key-value or value of an array
 					if (c == '{')
 						isKey = true;
 				}
@@ -105,8 +105,13 @@ bool validate_json(char* json_str){
 			break;
 		}
 	}
+	if(c_stack->size > 0) {
+		invalid = true;
+	}
 
 	return (!invalid);
 }
+
+// on top of stack
 
 #endif
