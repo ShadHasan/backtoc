@@ -24,7 +24,7 @@ int json_test() {
 	}
 	printf("\n");
 	*/
-	bool valid = validate_json(jsonstr1);
+	bool valid = validate_json(jsonstr);
 	if (valid) {
 		printf("\nValid json");
 	} else {

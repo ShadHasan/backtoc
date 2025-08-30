@@ -43,17 +43,17 @@ bool validate_json(char* json_str){
 
 		switch(json_str[i]) {
 			case '{':
-				if (c != '"') {
+				if (c != '"') {   // if " is not otos. Not string literal but json syntax
 					push_adv_char_stack(c_stack, '{');
 				}
 				break;
 			case '[':
-				if (c != '"') {
+				if (c != '"') {   // if " is not otos. Not string literal but json syntax
 					push_adv_char_stack(c_stack, '[');
 				}
 				break;
 			case '"':
-				if (c != '"') {
+				if (c != '"') {   // if " is not otos. Not string literal but json syntax
 					push_adv_char_stack(c_stack, '"');
 				} else {
 					poped_c = pop_adv_char_stack(c_stack);
@@ -61,17 +61,21 @@ bool validate_json(char* json_str){
 				}
 				break;
 			case '}':
-				if (c != '{') {
-					invalid = true;
-				} else {
-					poped_c = pop_adv_char_stack(c_stack);
+				if (c != '"') {   // if " is not otos. Not string literal but json syntax
+					if (c != '{') {
+						invalid = true;
+					} else {
+						poped_c = pop_adv_char_stack(c_stack);
+					}
 				}
 				break;
 			case ']':
-				if (c != '[') {
-					invalid = true;
-				} else {
-					poped_c = pop_adv_char_stack(c_stack);
+				if (c != '"') {   // if " is not otos. Not string literal but json syntax
+					if (c != '[') {
+						invalid = true;
+					} else {
+						poped_c = pop_adv_char_stack(c_stack);
+					}
 				}
 				break;
 			case ':':    // Time to separate key from its value
@@ -88,7 +92,7 @@ bool validate_json(char* json_str){
 				}
 				break;
 			case ',':
-				if (c != '"') {  // if " is not otos. It is not string literal but json syntax and it is either next key-value or value of an array
+				if (c != '"') {  // if " is not otos. Not string literal but json syntax and it is either next key-value or value of an array
 					if (c == '{')
 						isKey = true;
 				}
