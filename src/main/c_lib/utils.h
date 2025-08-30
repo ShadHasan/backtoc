@@ -12,21 +12,20 @@ void tstring(char* ts, char c) {
 		ts[0] = c;
 		ts[1] = '\0';
 	} else {
-		ts = (char*)realloc(ts, (len+1)*sizeof(char));
-		ts[len-1] = c;
-		ts[len] = '\0';
+		ts = (char*)realloc(ts, (len+2)*sizeof(char));
+		ts[len] = c;
+		ts[len+1] = '\0';
 	}
 	printf("%d, %s\n", len, ts);
 
 }
 
 void free_tstring(char* ts) {
+	printf("faulting");
 	int len = strlen(ts);
 	int i;
-	for (i = 1; i < len; i++) {
-		free(ts[i]);
-	}
-
+	ts = (char*)realloc(ts, (1)*sizeof(char));
+	ts[0] = '\0';
 }
 
 bool validate_json(char* json_str){
