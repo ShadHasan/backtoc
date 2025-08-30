@@ -179,6 +179,14 @@ bool validate_json(char* json_str){
 							invalid = true;
 						} else {
 							reset_depth_element(depth);
+							switch(c) {
+							case '{':
+								isKey = true;
+								break;
+							case '[':
+								isKey = false;
+								break;
+							}
 						}
 					}
 				}
