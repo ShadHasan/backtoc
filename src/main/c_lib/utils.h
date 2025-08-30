@@ -5,7 +5,7 @@
 #include <string.h>
 #include "model/common/stack.h"
 
-typedef adv_depth adv_depth;
+typedef struct adv_depth adv_depth;
 
 struct adv_depth {
 	int current_depth;
@@ -36,15 +36,16 @@ void free_tstring(char* ts) {
 	ts[0] = '\0';
 }
 
-void increment_depth_element(adv_depth* depth_trace, int depth) {
-	if(depth > depth_trace->allocated) {
+void set_depth_element(adv_depth* depth_trace) {
+	if(depth_trace->current_depth > depth_trace->allocated) {
 		depth_trace->depth_element_count = (int*)realloc(depth_trace->depth_element_count, (++depth_trace->allocated)*sizeof(int));
+
 	}
-	depth_trace->depth_element_count[depth]++;
+	depth_trace->depth_element_count[depth_trace->current_depth] = 1;
 }
 
-void reset_depth_element(adv_depth* depth_trace, int depth){
-	depth_trace->depth_element_count[depth] = 0;
+void reset_depth_element(adv_depth* depth_trace){
+	depth_trace->depth_element_count[depth_trace->current_depth] = 0;
 }
 
 
@@ -61,11 +62,11 @@ bool validate_json(char* json_str){
 
 	// current level of depth which is root represent
 	// as 0 in json tree which have only one element
-	adv_depth *depth = malloc(sizeof(_depth));
+	adv_depth *depth = malloc(sizeof(depth));
 	depth->current_depth = 0;
 	depth->allocated = 1;
 	depth->depth_element_count = (int*)malloc(sizeof(int));
-	depth->depth_element_count[0] = 1
+	depth->depth_element_count[0] = 1;
 
 	char* ts = (char*)malloc(sizeof(char));
 	ts[0] = '\0';
@@ -106,11 +107,13 @@ bool validate_json(char* json_str){
 					// here get the key in ts if isKey "true" else value
 					switch(c) {
 						case '{':
-
+							// key or value
 							break;
 						case '[':
+							// value
 							break;
 					}
+					set_depth_element(depth);
 				}
 				break;
 			case '}':
@@ -121,6 +124,7 @@ bool validate_json(char* json_str){
 						poped_c = pop_adv_char_stack(c_stack);
 						// Todo: here link kv object to predecessor
 						free_tstring(ts);
+						reset_depth_element(depth);
 						depth->current_depth--;
 					}
 				}
@@ -133,6 +137,7 @@ bool validate_json(char* json_str){
 						poped_c = pop_adv_char_stack(c_stack);
 						// Todo: here link kv array to predecessor
 						free_tstring(ts);
+						reset_depth_element(depth);
 						depth->current_depth--;
 					}
 				}
@@ -143,7 +148,7 @@ bool validate_json(char* json_str){
 				} else {
 					if (c != '"') {  // if " is not on top of stack. It is not string literal but json syntax and it is key but value.
 						isKey = false;
-						// Todo: here push string kv object keys
+						// TODO: here push string kv object keys
 						free_tstring(ts);
 					} else {
 						if (c == '[') {   // if c is [(array) it does not expect semicolon
@@ -157,20 +162,24 @@ bool validate_json(char* json_str){
 					if (strlen(ts) > 0) {
 						if (c == '{') {
 							if (isKey){
-								// Todo: store ts as temp_key for current kv object and pushed to kv object when value is determined.
+								// TODO: store ts as temp_key for current kv object and pushed to kv object when value is determined.
 							} else {
 								// TODO: push ts as values with keys in temp_key as a key to current kv object
 							}
 							isKey = true;
 						} else {
 							if ( c == '[') {
-								// Todo: push value to current kv array
+								// TODO: push value to current kv array
 							}
 						}
 						free_tstring(ts);
 					} else {
 						// TODO: invalid if current kv object or array does not have any value or key-value
-						invalid = true;  // TODO: it is incomplete
+						if (depth->depth_element_count[depth->current_depth] == 0) {
+							invalid = true;
+						} else {
+							reset_depth_element(depth);
+						}
 					}
 				}
 				break;
