@@ -24,12 +24,12 @@ void tstring(char* ts, char c) {
 		ts[len] = c;
 		ts[len+1] = '\0';
 	}
-	printf("%d, %s\n", len, ts);
+	// printf("%d, %s\n", len, ts);
 
 }
 
 void free_tstring(char* ts) {
-	printf("faulting");
+	// printf("faulting");
 	int len = strlen(ts);
 	int i;
 	ts = (char*)realloc(ts, (1)*sizeof(char));
