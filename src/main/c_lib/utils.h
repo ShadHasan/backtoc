@@ -45,11 +45,13 @@ bool validate_json(char* json_str){
 			case '{':
 				if (c != '"') {   // if " is not otos. Not string literal but json syntax
 					push_adv_char_stack(c_stack, '{');
+					isKey = true;
 				}
 				break;
 			case '[':
 				if (c != '"') {   // if " is not otos. Not string literal but json syntax
 					push_adv_char_stack(c_stack, '[');
+					isKey = false;
 				}
 				break;
 			case '"':
@@ -105,12 +107,13 @@ bool validate_json(char* json_str){
 		}
 
 		if (invalid) {
-			printf("\n Error at char: %c, index: %d\n", json_str[i], i);
+			printf("\n Error at char: %c, index: %d, stack: %c\n", json_str[i], i, c);
 			break;
 		}
 	}
 	if(c_stack->size > 0) {
 		invalid = true;
+		printf("\n Error at dangling syntax stack %d, char: %c", c_stack->size, seek_adv_char_stack(c_stack));
 	}
 
 	return (!invalid);
