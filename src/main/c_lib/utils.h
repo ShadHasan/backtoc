@@ -57,12 +57,13 @@ bool validate_json(char* json_str){
 				if (c != '"') {   // if " is not otos. Not string literal but json syntax
 					push_adv_char_stack(c_stack, '{');
 					isKey = true;
+					// TODO: Here initialize kv object
 				}
 				break;
 			case '[':
 				if (c != '"') {   // if " is not otos. Not string literal but json syntax
 					push_adv_char_stack(c_stack, '[');
-					// Todo: here initialize new kv
+					// TODO: here initialize new kv array
 					isKey = false;
 				}
 				break;
@@ -128,8 +129,8 @@ bool validate_json(char* json_str){
 						}
 						free_tstring(ts);
 					} else {
-						// TODO: invalid if current kv object or array does not have any value
-						invalid = true;
+						// TODO: invalid if current kv object or array does not have any value or key-value
+						invalid = true;  // TODO: it is incomplete
 					}
 				}
 				break;
