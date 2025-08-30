@@ -3,6 +3,24 @@
 #include <stdbool.h>
 #include "c_lib/utils.h"
 
+void valid_jaon(char* str) {
+	bool valid = validate_json(str);
+	if (valid) {
+		printf("\nPass: Valid json");
+	} else {
+		printf("\nFail: Not valid json");
+	}
+}
+
+void invalid_json(char* str) {
+	bool valid = validate_json(str);
+	if (valid) {
+		printf("\nFailed: Valid json");
+	} else {
+		printf("\nPass: Not valid json");
+	}
+}
+
 int json_test() {
 	char* jsonstr = "{\"key\": \"value\", \"key2\": [], \"key3\": {}}";
 
@@ -37,11 +55,24 @@ int json_test() {
 	}
 	printf("\n");
 	*/
-	bool valid = validate_json(vjsonstr1);
-	if (valid) {
-		printf("\nValid json");
-	} else {
-		printf("\nNot valid json");
-	}
+	invalid_json(jsonstr1);
+	invalid_json(jsonstr2);
+	invalid_json(jsonstr3);
+	invalid_json(jsonstr4);
+	invalid_json(jsonstr6);
+	invalid_json(jsonstr7);
+	invalid_json(jsonstr8);
+	invalid_json(jsonstr9);
+	invalid_json(jsonstr10);
+	invalid_json(jsonstr11);
+
+
+	valid_jaon(vjsonstr1);
+	valid_jaon(vjsonstr2);
+	valid_jaon(vjsonstr3);
+	valid_jaon(vjsonstr4);
+	valid_jaon(vjsonstr5);
+	valid_jaon(vjsonstr6);
+
 	return 0;
 }
