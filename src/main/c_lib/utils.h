@@ -62,6 +62,7 @@ bool validate_json(char* json_str){
 			case '[':
 				if (c != '"') {   // if " is not otos. Not string literal but json syntax
 					push_adv_char_stack(c_stack, '[');
+					// Todo: here initialize new kv
 					isKey = false;
 				}
 				break;
@@ -79,6 +80,7 @@ bool validate_json(char* json_str){
 						invalid = true;
 					} else {
 						poped_c = pop_adv_char_stack(c_stack);
+						// Todo: here link kv object to predecessor
 						free_tstring(ts);
 					}
 				}
@@ -89,6 +91,7 @@ bool validate_json(char* json_str){
 						invalid = true;
 					} else {
 						poped_c = pop_adv_char_stack(c_stack);
+						// Todo: here link kv array to predecessor
 						free_tstring(ts);
 					}
 				}
@@ -99,6 +102,8 @@ bool validate_json(char* json_str){
 				} else {
 					if (c != '"') {  // if " is not on top of stack. It is not string literal but json syntax and it is key but value.
 						isKey = false;
+						// Todo: here push string kv object keys
+						free_tstring(ts);
 					} else {
 						if (c == '[') {   // if c is [(array) it does not expect semicolon
 							invalid = true;
@@ -108,10 +113,22 @@ bool validate_json(char* json_str){
 				break;
 			case ',':
 				if (c != '"') {  // if " is not otos. Not string literal but json syntax and it is either next key-value or value of an array
-					if (ts != NULL) {
-						if (c == '{')
+					if (strlen(ts) > 0) {
+						if (c == '{') {
+							if (isKey){
+								// Todo: store ts as temp_key for current kv object and pushed to kv object when value is determined.
+							} else {
+								// TODO: push ts as values with keys in temp_key as a key to current kv object
+							}
 							isKey = true;
+						} else {
+							if ( c == '[') {
+								// Todo: push value to current kv array
+							}
+						}
+						free_tstring(ts);
 					} else {
+						// TODO: invalid if current kv object or array does not have any value
 						invalid = true;
 					}
 				}

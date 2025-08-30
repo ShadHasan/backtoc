@@ -23,6 +23,9 @@ int json_test() {
 	char* vjsonstr1 = "{\"key\": \"value\", \"key2\": [], \"key3\": {\"key3\":{}}}";
 	char* vjsonstr2 = "{}";
 	char* vjsonstr3 = "[]";
+	char* vjsonstr4 = "{\"key\": \"{\"}";
+	char* vjsonstr5 = "[\"\"]";
+	char* vjsonstr6 = "[\",\"]";
 
 	/*
 	int len = strlen(jsonstr);
