@@ -11,15 +11,18 @@ int json_test() {
 	char* jsonstr2 = "{\"key\": \"value\", \"key2\": [], \"key3\": {}}}";
 	char* jsonstr3 = "{";
 	char* jsonstr4 = "";
-	char* jsonstr5 = "{}";
+
 	char* jsonstr6 = "}";
 	char* jsonstr7 = "[";
-	char* jsonstr8 = "[]";
+	char* jsonstr8 = "[,]";
 	char* jsonstr9 = "]";
 	char* jsonstr10 = "{\"key\": \"value\", \"key2\": [], \"key3\": {\"key3\":{}}";
+	char* jsonstr11 = "{,}";
 
 	// List of valid json
 	char* vjsonstr1 = "{\"key\": \"value\", \"key2\": [], \"key3\": {\"key3\":{}}}";
+	char* vjsonstr2 = "{}";
+	char* vjsonstr3 = "[]";
 
 	/*
 	int len = strlen(jsonstr);

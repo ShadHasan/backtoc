@@ -6,14 +6,25 @@
 #include "model/common/stack.h"
 
 void tstring(char* ts, char c) {
-
-	if (ts == NULL) {
-		ts = (char*)malloc(sizeof(char));
-		ts[0] = c;
-	} else {
-		int len = strlen(ts);
+	int len = strlen(ts);
+	if (len <= 0) {
 		ts = (char*)realloc(ts, (len+1)*sizeof(char));
-		ts[len] = c;
+		ts[0] = c;
+		ts[1] = '\0';
+	} else {
+		ts = (char*)realloc(ts, (len+1)*sizeof(char));
+		ts[len-1] = c;
+		ts[len] = '\0';
+	}
+	printf("%d, %s\n", len, ts);
+
+}
+
+void free_tstring(char* ts) {
+	int len = strlen(ts);
+	int i;
+	for (i = 1; i < len; i++) {
+		free(ts[i]);
 	}
 
 }
@@ -28,7 +39,8 @@ bool validate_json(char* json_str){
 	bool isKey = true;
 	short type;  // array 0, object 1, string 2
 
-	char* ts = NULL;
+	char* ts = (char*)malloc(sizeof(char));
+	ts[0] = '\0';
 
 	adv_char_stack* c_stack = malloc(sizeof(adv_char_stack));
 	c_stack->c = NULL;
@@ -68,6 +80,7 @@ bool validate_json(char* json_str){
 						invalid = true;
 					} else {
 						poped_c = pop_adv_char_stack(c_stack);
+						free_tstring(ts);
 					}
 				}
 				break;
@@ -77,6 +90,7 @@ bool validate_json(char* json_str){
 						invalid = true;
 					} else {
 						poped_c = pop_adv_char_stack(c_stack);
+						free_tstring(ts);
 					}
 				}
 				break;
@@ -95,8 +109,12 @@ bool validate_json(char* json_str){
 				break;
 			case ',':
 				if (c != '"') {  // if " is not otos. Not string literal but json syntax and it is either next key-value or value of an array
-					if (c == '{')
-						isKey = true;
+					if (ts != NULL) {
+						if (c == '{')
+							isKey = true;
+					} else {
+						invalid = true;
+					}
 				}
 				break;
 			default:
@@ -107,7 +125,7 @@ bool validate_json(char* json_str){
 		}
 
 		if (invalid) {
-			printf("\n Error at char: %c, index: %d, stack: %c\n", json_str[i], i, c);
+			printf("\n Error at char: '%c', index: %d, stack: %c, ts: %s\n", json_str[i], i, c, ts);
 			break;
 		}
 	}
