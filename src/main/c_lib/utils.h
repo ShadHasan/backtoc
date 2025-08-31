@@ -9,7 +9,10 @@ typedef struct adv_depth adv_depth;
 
 struct adv_depth {
 	int current_depth;
+	int current_depth_type;
 	int* depth_element_count;
+	char** depth_temp_key;
+	char** depth_temp_value;
 	int allocated;
 };
 
@@ -74,7 +77,6 @@ bool validate_json(char* json_str){
 	adv_char_stack* c_stack = malloc(sizeof(adv_char_stack));
 	c_stack->c = NULL;
 	c_stack->size = 0;
-	printf("%d", c_stack->size);
 	for(i=0;i<len;i++) {
 
 		if (c_stack->size > 0)
@@ -159,35 +161,26 @@ bool validate_json(char* json_str){
 				break;
 			case ',':
 				if (c != '"') {  // if " is not otos. Not string literal but json syntax and it is either next key-value or value of an array
-					if (strlen(ts) > 0) {
-						if (c == '{') {
+					// TODO: invalid if current kv object or array does not have any value or key-value
+					if (depth->depth_element_count[depth->current_depth] == 0) {
+						invalid = true;
+					} else {
+						reset_depth_element(depth);
+						switch(c) {
+						case '{':
 							if (isKey){
 								// TODO: store ts as temp_key for current kv object and pushed to kv object when value is determined.
 							} else {
 								// TODO: push ts as values with keys in temp_key as a key to current kv object
 							}
 							isKey = true;
-						} else {
-							if ( c == '[') {
-								// TODO: push value to current kv array
-							}
+							break;
+						case '[':
+							// TODO: push value to current kv array
+							isKey = false;
+							break;
 						}
 						free_tstring(ts);
-					} else {
-						// TODO: invalid if current kv object or array does not have any value or key-value
-						if (depth->depth_element_count[depth->current_depth] == 0) {
-							invalid = true;
-						} else {
-							reset_depth_element(depth);
-							switch(c) {
-							case '{':
-								isKey = true;
-								break;
-							case '[':
-								isKey = false;
-								break;
-							}
-						}
 					}
 				}
 				break;
