@@ -25,7 +25,7 @@ struct adv_kv_array{
 struct adv_kv_obj {
 	// key list blueprint. It helps to keep track of used key.
 	// Hence used to prevent duplicate key for data structure
-	adv_l_key_set* keys;
+	adv_lks_keys* keys;
 
 	short type; // array 0, object 1, string 2
 
@@ -49,7 +49,7 @@ adv_kv_obj* adv_init_kv(int type) {
 	adv_kv_obj* obj = (adv_kv_obj*)malloc(sizeof(adv_kv_obj));
 
 	// initializing root key with given type
-	obj->keys = (adv_l_key_set*)malloc(sizeof(adv_l_key_set));
+	obj->keys = (adv_kv_obj*)malloc(sizeof(adv_kv_obj));
 	adv_init_lks(obj->keys);
 	adv_add_key_with_attr_lks(obj->keys,"(0)", type, 0);
 

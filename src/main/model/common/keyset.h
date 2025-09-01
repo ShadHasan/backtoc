@@ -14,11 +14,11 @@ typedef struct {
 	int index;
 	int type;
 	int type_index;
-} adv_index_data;
+} adv_lks_index_data;
 
 struct adv_l_key_set {
         char* str;
-        int type;      // This is used to defined type for key-val
+        int type;           // This is used to defined type for key-val
         int type_index;     // This basically hold index, again some extra attribute
         adv_l_key_set* next;
 };
@@ -29,26 +29,45 @@ typedef struct {
 	int count_array;
 	int count_string;
 	int count_keys;
-} adv_lks_key;
+} adv_lks_keys;
 
-void adv_init_lks(adv_l_key_set* lks) {
-        lks->str = "(.)";
-        lks->next = NULL;
+void adv_init_lks(adv_lks_keys* lks) {
+	lks->keys* = NULL;
+    lks->count_object = 0;
+    lks->count_keys = 0;
+    lks->count_array = 0;
+    lks->count_string = 0;
 }
 
-void adv_add_key_lks(adv_l_key_set* lks, char* str) {
-
+void adv_add_key_lks(adv_lks_keys* lks, char* str, int type) {
 	adv_l_key_set* t_lks;
 	t_lks = (adv_l_key_set*)malloc(sizeof(adv_l_key_set));
-	t_lks->str = str;
+	// array 0, object 1, string 2
+	switch (type) {
+		case 0:
+			t_lks->type_index = lks->count_array++;
+			t_lks->type = 0;
+			break;
+		case 1:
+			t_lks->type_index = lks->count_object++;
+			t_lks->type = 1;
+			break;
+		case 2:
+			t_lks->type_index = lks->count_string++;
+			t_lks->type = 2;
+			break;
+	}
 	t_lks->next = NULL;
+	t_lks->str = str;
+	adv_l_key_set* keys = lks->keys;
 	bool ignore = false;
-	while(lks->next != NULL) {
-		if (strcmp(lks->next->str, str) == 0) {
+	while(keys != NULL) {
+		if (strcmp(keys->str, str) == 0) {
+			keys->type = type;
 			ignore = true;
 			break;
 		}
-		lks = lks->next;
+		keys = keys->next;
 	}
 	if (!ignore) {
 		lks->next = t_lks;
@@ -97,7 +116,7 @@ void adv_del_key_lks(adv_l_key_set* lks, char* str) {
 
 adv_index_data adv_index_key_lks(adv_l_key_set* lks, char* str) {
 	int index = -1;
-	adv_index_data index_data;
+	adv_lks_index_data index_data;
 	int count = 0;
 	lks = lks->next;
 	while (lks != NULL) {
