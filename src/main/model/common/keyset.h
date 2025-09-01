@@ -111,7 +111,7 @@ void adv_add_key_lks(adv_lks_keys* lks, char* str, int type, int type_index) {
 
 void adv_del_key_lks(adv_lks_keys* lks, char* str) {
 	int count = 0;
-	int found = false;
+	bool found = false;
 	adv_l_key_set* keys = lks->keys;
 	adv_l_key_set* prev = lks->keys;
 	while (keys != NULL) {
@@ -131,7 +131,6 @@ void adv_del_key_lks(adv_lks_keys* lks, char* str) {
 				}
 			}
 			found = true;
-			free(keys);
 			break;
 		}
 		prev = keys;
@@ -140,6 +139,7 @@ void adv_del_key_lks(adv_lks_keys* lks, char* str) {
 	}
 	if (found) {
 		adv_lks_key_dec(lks, keys->type);
+		free(keys);
 	}
 }
 

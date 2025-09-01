@@ -17,4 +17,18 @@ void kv_test() {
 	adv_traverse_lks(keyset);
 
 	printf("count object: %d, array: %d, string: %d\n", keyset->count_object, keyset->count_array, keyset->count_string);
+
+	adv_del_key_lks(keyset, "no idea");
+	adv_traverse_lks(keyset);
+	printf("count object: %d, array: %d, string: %d\n", keyset->count_object, keyset->count_array, keyset->count_string);
+
+	// negative testing if there is not such key. It won't do anything
+	adv_del_key_lks(keyset, "idea");
+	adv_traverse_lks(keyset);
+	printf("count object: %d, array: %d, string: %d\n", keyset->count_object, keyset->count_array, keyset->count_string);
+
+	adv_del_key_lks(keyset, "hello");
+	adv_del_key_lks(keyset, "world");
+	adv_traverse_lks(keyset);
+	printf("count object: %d, array: %d, string: %d\n", keyset->count_object, keyset->count_array, keyset->count_string);
 }
