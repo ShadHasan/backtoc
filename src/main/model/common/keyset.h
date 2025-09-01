@@ -39,107 +39,131 @@ void adv_init_lks(adv_lks_keys* lks) {
     lks->count_string = 0;
 }
 
-void adv_add_key_lks(adv_lks_keys* lks, char* str, int type) {
-	adv_l_key_set* t_lks;
-	t_lks = (adv_l_key_set*)malloc(sizeof(adv_l_key_set));
-	// array 0, object 1, string 2
+void adv_lks_key_inc(adv_lks_keys* lks, adv_l_key_set* t_lks, int type) {
 	switch (type) {
 		case 0:
-			t_lks->type_index = lks->count_array++;
+			lks->count_array++;
 			t_lks->type = 0;
 			break;
 		case 1:
-			t_lks->type_index = lks->count_object++;
+			lks->count_object++;
 			t_lks->type = 1;
 			break;
 		case 2:
-			t_lks->type_index = lks->count_string++;
+			lks->count_string++;
 			t_lks->type = 2;
 			break;
 	}
+}
+
+void adv_lks_key_dec(adv_lks_keys* lks, int type) {
+	switch (type) {
+		case 0:
+			lks->count_array--;
+			break;
+		case 1:
+			lks->count_object--;
+			break;
+		case 2:
+			lks->count_string--;
+			break;
+	}
+}
+
+void adv_add_key_lks(adv_lks_keys* lks, char* str, int type, int type_index) {
+	adv_l_key_set* t_lks = (adv_l_key_set*)malloc(sizeof(adv_l_key_set));
+	// array 0, object 1, string 2
+	adv_lks_key_inc(lks, t_lks, type);
 	t_lks->next = NULL;
 	t_lks->str = str;
+	t_lks->type_index = type_index;
+
 	adv_l_key_set* keys = lks->keys;
-	bool ignore = false;
+	bool found = false;
 	while(keys != NULL) {
 		if (strcmp(keys->str, str) == 0) {
-			keys->type = type;
-			ignore = true;
+			found = true;
 			break;
 		}
 		keys = keys->next;
 	}
-	if (!ignore) {
+	if (!found) {
 		lks->next = t_lks;
+	} else {
+		int current_type = keys->type;
+		adv_lks_key_dec(lks, current_type);
+		adv_lks_key_inc(lks, keys, type);
+		keys->type = type;
+		keys->type_index = type_index;
 	}
 }
 
-void adv_add_key_with_attr_lks(adv_l_key_set* lks, char* str, int type, int type_index) {
-
-	adv_l_key_set* t_lks;
-	t_lks = (adv_l_key_set*)malloc(sizeof(adv_l_key_set));
-	t_lks->str = str;
-	t_lks->type = type;
-	t_lks->type_index = type_index;
-	t_lks->next = NULL;
-	bool ignore = false;
-	while(lks->next != NULL) {
-		if (strcmp(lks->next->str, str) == 0) {
-			ignore = true;
-			break;
-		}
-		lks = lks->next;
-	}
-	if (!ignore) {
-		lks->next = t_lks;
-	}
-}
-
-void adv_del_key_lks(adv_l_key_set* lks, char* str) {
-	adv_l_key_set* prev = lks;
-	lks = lks->next;
-	while (lks != NULL) {
-		if(strcmp(lks->str, str)==0) {
-
-			if (lks->next == NULL) {
-					prev->next = NULL;
-			} else {
-					prev->next = lks->next;
-			}
-			free(lks);
-			break;
-		}
-		prev = lks;
-		lks = lks->next;
-	}
-}
-
-adv_index_data adv_index_key_lks(adv_l_key_set* lks, char* str) {
-	int index = -1;
-	adv_lks_index_data index_data;
+void adv_del_key_lks(adv_lks_keys* lks, char* str) {
 	int count = 0;
+	int found = false;
+	adv_l_key_set* keys = lks->keys;
+	adv_l_key_set* prev = lks->keys;
+	if (keys->next != NULL) {
+		adv_l_key_set* next = lks->keys->next;
+	}
+	adv_l_key_set* 1st_next = lks->keys->next;
 	lks = lks->next;
-	while (lks != NULL) {
-		if (strcmp(lks->str, str) == 0) {
+	while (keys != NULL) {
+		if(strcmp(keys->str, str)==0) {
+			if (count == 0) {
+				if (keys->next == NULL) {
+					lks->keys = NULL;
+				} else {
+					lks->keys = lks->keys->next;
+				}
+			}
+			else {
+				if (keys->next == NULL) {
+					prev->next = NULL;
+				} else {
+					prev->next = keys->next;
+				}
+			}
+			found = true;
+			free(keys);
+			break;
+		}
+		prev = keys;
+		keys = keys->next;
+		count++;
+	}
+	if (found) {
+		adv_lks_key_dec(lks, keys->type);
+	}
+}
+
+adv_index_data adv_index_key_lks(adv_lks_keys* lks, char* str) {
+	adv_l_key_set* keys = lks->keys;
+	adv_lks_index_data index_data;
+	index_data.index = -1;
+	int count = 0;
+	while (keys != NULL) {
+		if (strcmp(keys->str, str) == 0) {
 			index_data.index = count;
 			index_data.key = str;
-			index_data.type = lks->type;
-			index_data.type_index = lks->type_index;
+			index_data.type = keys->type;
+			index_data.type_index = keys->type_index;
 			break;
 		}
-		lks = lks->next;
+		keys = keys->next;
 		count++;
 	}
 	return index_data;
 }
 
 
-void adv_traverse_lks(adv_l_key_set* lks) {
-        while (lks != NULL) {
-                printf("%s->",lks->str);
-                lks = lks->next;
-        }
-        printf("NULL\n");
+void adv_traverse_lks(adv_lks_keys* lks) {
+	adv_l_key_set* keys = lks->keys;
+	while (keys != NULL) {
+			printf("%s->",keys->str);
+			keys = keys->next;
+	}
+	printf("NULL\n");
 }
 
 #endif
