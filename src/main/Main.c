@@ -6,9 +6,9 @@
 #include "c_lib/math.h"
 #include "c_lib/math2.h"
 #include "utilities/fileIO.h"
-#include "model/common/keyval.h"
 #include "model/common/stack.h"
 #include "test/utils_test.c"
+#include "test/keyval_test.c"
 //#include "kernel_program_map/map.h"
 
 int main()
@@ -55,12 +55,12 @@ int main()
 
 	// initializing keyvalue, 1 mean object, 0 mean array
 	// you cannot initialize as string
-	adv_kv_obj* kv1 = adv_init_kv(1);
-	char c;
+
 
 
 	/*
 	// Verify stack feature
+	 * char c;
 	adv_char_stack* c_stack;// = init_adv_char_stack('f');
 	c_stack->c = NULL;
 	c_stack->size = 0;
@@ -88,7 +88,8 @@ int main()
 	// Testing kernel map loading
 
 	// testing
-	json_test();
+	// json_test();
+	kv_test();
 
     return 0;
 }

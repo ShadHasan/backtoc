@@ -60,10 +60,10 @@ adv_kv_obj* adv_init_kv(int type) {
 	return obj;
 }
 
-/// This is all when root kv is of object type
+/// This is all when kv object adding other kv object
 void add_obj_to_adv_kv_obj(adv_kv_obj* kv, char* key, adv_kv_obj* obj) {
-	int index = adv_index_key_lks(kv->keys, key);
-	if (index < 0) {
+	adv_index_data index = adv_index_key_lks(kv->keys, key);
+	if (index.index < 0) {
 		adv_add_key_lks(obj->keys, key);
 	}
 }
