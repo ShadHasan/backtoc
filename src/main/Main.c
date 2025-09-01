@@ -6,8 +6,8 @@
 #include "c_lib/math.h"
 #include "c_lib/math2.h"
 #include "utilities/fileIO.h"
-#include "model/common/stack.h"
 #include "test/utils_test.c"
+#include "test/stack_test.c"
 #include "test/keyval_test.c"
 //#include "kernel_program_map/map.h"
 
@@ -56,40 +56,19 @@ int main()
 	// initializing keyvalue, 1 mean object, 0 mean array
 	// you cannot initialize as string
 
-
-
-	/*
-	// Verify stack feature
-	 * char c;
-	adv_char_stack* c_stack;// = init_adv_char_stack('f');
-	c_stack->c = NULL;
-	c_stack->size = 0;
-	push_adv_char_stack(c_stack, 'f');
-	push_adv_char_stack(c_stack, 'i');
-	push_adv_char_stack(c_stack, 'r');
-	c = seek_adv_char_stack(c_stack);
-	printf("\n seek stack: %c \n",c);
-	c = pop_adv_char_stack(c_stack);
-	printf("\n pop stack: %c \n",c);
-	c = seek_adv_char_stack(c_stack);
-	printf("\n %c \n",c);
-	push_adv_char_stack(c_stack, 'r');
-	push_adv_char_stack(c_stack, 's');
-	push_adv_char_stack(c_stack, 't');
-
-	while(c_stack->size > 0) {
-		c = pop_adv_char_stack(c_stack);
-		printf("\n pop stack: %c \n",c);
-	}
-	*/
-
 	// kernel_program_list_map_ds kernal_list_map;
 
 	// Testing kernel map loading
 
-	// testing
-	// json_test();
+
+	// Verify stack feature
+	stack_char_test();
+
+	// kv ds testing
 	kv_test();
+
+	// utilities testing
+	json_test();
 
     return 0;
 }
