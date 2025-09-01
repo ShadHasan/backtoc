@@ -1,6 +1,7 @@
 #ifndef ADVANIEN_COMMON_KEYSET
 #define ADVANIEN_COMMON_KEYSET
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
@@ -31,12 +32,14 @@ typedef struct {
 	int count_keys;
 } adv_lks_keys;
 
-void adv_init_lks(adv_lks_keys* lks) {
-	lks->keys* = NULL;
+adv_lks_keys* adv_init_lks() {
+	adv_lks_keys* lks = (adv_lks_keys*)malloc(sizeof(adv_lks_keys));
+	lks->keys = NULL;
     lks->count_object = 0;
     lks->count_keys = 0;
     lks->count_array = 0;
     lks->count_string = 0;
+    return lks;
 }
 
 void adv_lks_key_inc(adv_lks_keys* lks, adv_l_key_set* t_lks, int type) {
@@ -72,15 +75,21 @@ void adv_lks_key_dec(adv_lks_keys* lks, int type) {
 
 void adv_add_key_lks(adv_lks_keys* lks, char* str, int type, int type_index) {
 	adv_l_key_set* t_lks = (adv_l_key_set*)malloc(sizeof(adv_l_key_set));
+
 	// array 0, object 1, string 2
 	adv_lks_key_inc(lks, t_lks, type);
+
 	t_lks->next = NULL;
 	t_lks->str = str;
 	t_lks->type_index = type_index;
 
+	adv_l_key_set* current_key = lks->keys;
 	adv_l_key_set* keys = lks->keys;
+
 	bool found = false;
+
 	while(keys != NULL) {
+		current_key = keys;
 		if (strcmp(keys->str, str) == 0) {
 			found = true;
 			break;
@@ -88,7 +97,11 @@ void adv_add_key_lks(adv_lks_keys* lks, char* str, int type, int type_index) {
 		keys = keys->next;
 	}
 	if (!found) {
-		lks->next = t_lks;
+		if (current_key != NULL) {
+			current_key->next = t_lks;
+		} else {
+			lks->keys = t_lks;
+		}
 	} else {
 		int current_type = keys->type;
 		adv_lks_key_dec(lks, current_type);
@@ -103,11 +116,6 @@ void adv_del_key_lks(adv_lks_keys* lks, char* str) {
 	int found = false;
 	adv_l_key_set* keys = lks->keys;
 	adv_l_key_set* prev = lks->keys;
-	if (keys->next != NULL) {
-		adv_l_key_set* next = lks->keys->next;
-	}
-	adv_l_key_set* 1st_next = lks->keys->next;
-	lks = lks->next;
 	while (keys != NULL) {
 		if(strcmp(keys->str, str)==0) {
 			if (count == 0) {
@@ -137,7 +145,7 @@ void adv_del_key_lks(adv_lks_keys* lks, char* str) {
 	}
 }
 
-adv_index_data adv_index_key_lks(adv_lks_keys* lks, char* str) {
+adv_lks_index_data adv_index_key_lks(adv_lks_keys* lks, char* str) {
 	adv_l_key_set* keys = lks->keys;
 	adv_lks_index_data index_data;
 	index_data.index = -1;

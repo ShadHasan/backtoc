@@ -49,7 +49,7 @@ adv_kv_obj* adv_init_kv(int type) {
 	adv_kv_obj* obj = (adv_kv_obj*)malloc(sizeof(adv_kv_obj));
 
 	// initializing root key with given type
-	obj->keys = (adv_kv_obj*)malloc(sizeof(adv_kv_obj));
+	obj->keys = (adv_lks_keys*)malloc(sizeof(adv_lks_keys));
 	adv_init_lks(obj->keys);
 	adv_add_key_with_attr_lks(obj->keys,"(0)", type, 0);
 
