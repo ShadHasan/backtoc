@@ -11,7 +11,10 @@ void kv_test() {
 	adv_add_key_lks(keyset, "hello", 2, 0);
 	adv_add_key_lks(keyset, "world", 2, 2);
 	adv_add_key_lks(keyset, "no idea", 2, 3);
-
 	adv_traverse_lks(keyset);
 
+	adv_add_key_lks(keyset, "world", 2, 1);
+	adv_traverse_lks(keyset);
+
+	printf("count object: %d, array: %d, string: %d\n", keyset->count_object, keyset->count_array, keyset->count_string);
 }

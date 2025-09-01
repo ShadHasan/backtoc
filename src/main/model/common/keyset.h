@@ -17,6 +17,7 @@ typedef struct {
 	int type_index;
 } adv_lks_index_data;
 
+// array 0, object 1, string 2
 struct adv_l_key_set {
         char* str;
         int type;           // This is used to defined type for key-val
@@ -74,15 +75,6 @@ void adv_lks_key_dec(adv_lks_keys* lks, int type) {
 }
 
 void adv_add_key_lks(adv_lks_keys* lks, char* str, int type, int type_index) {
-	adv_l_key_set* t_lks = (adv_l_key_set*)malloc(sizeof(adv_l_key_set));
-
-	// array 0, object 1, string 2
-	adv_lks_key_inc(lks, t_lks, type);
-
-	t_lks->next = NULL;
-	t_lks->str = str;
-	t_lks->type_index = type_index;
-
 	adv_l_key_set* current_key = lks->keys;
 	adv_l_key_set* keys = lks->keys;
 
@@ -97,6 +89,12 @@ void adv_add_key_lks(adv_lks_keys* lks, char* str, int type, int type_index) {
 		keys = keys->next;
 	}
 	if (!found) {
+		adv_l_key_set* t_lks = (adv_l_key_set*)malloc(sizeof(adv_l_key_set));
+		adv_lks_key_inc(lks, t_lks, type);
+		t_lks->next = NULL;
+		t_lks->str = str;
+		t_lks->type_index = type_index;
+
 		if (current_key != NULL) {
 			current_key->next = t_lks;
 		} else {
@@ -168,7 +166,7 @@ adv_lks_index_data adv_index_key_lks(adv_lks_keys* lks, char* str) {
 void adv_traverse_lks(adv_lks_keys* lks) {
 	adv_l_key_set* keys = lks->keys;
 	while (keys != NULL) {
-			printf("%s->",keys->str);
+			printf("(%s, %d, %d)->",keys->str, keys->type, keys->type_index);
 			keys = keys->next;
 	}
 	printf("NULL\n");
