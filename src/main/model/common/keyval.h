@@ -185,7 +185,7 @@ void adv_kv_add_obj_obj(adv_kv_obj* kv, char* key, adv_kv_obj* obj) {
 	adv_add_key_lks(kv->keyset, key, type, type_index);
 	if (new_allocate) {
 	// adding new object against the key;
-		if (type_index > 1) {
+		if (kv->count_object > 1) {
 			kv->children = (adv_kv_obj**)realloc(kv->children , (kv->count_object)*(sizeof(adv_kv_obj*)));
 		} else {
 			kv->children = (adv_kv_obj**)malloc(sizeof(adv_kv_obj*));
@@ -200,7 +200,6 @@ void adv_kv_add_obj_str(adv_kv_obj* kv, char* key, char* value) {
 	bool new_allocate = false;
 	int type = 2;
 
-	printf("keyindex: %d", key_index_data.index);
 	// deleting(Assign NULL) to children,value_list, value to it index if already existing anything against the key
 	if(key_index_data.index != -1) {
 		int del_type = key_index_data.type;
@@ -210,7 +209,6 @@ void adv_kv_add_obj_str(adv_kv_obj* kv, char* key, char* value) {
 
 	// First check children of type object have null value. Take that is as type index else use count_object as type_index.
 	int type_index = adv_kv_fetch_obj_index_type_for_null(kv, type);
-
 	if (type_index == -1) {
 		new_allocate = true;
 		type_index = kv->count_string++;
@@ -218,13 +216,12 @@ void adv_kv_add_obj_str(adv_kv_obj* kv, char* key, char* value) {
 	adv_add_key_lks(kv->keyset, key, type, type_index);
 	if (new_allocate) {
 	// adding new object against the key;
-		if (type_index > 1) {
+		if (kv->count_string > 1) {
 			kv->value = (char**)realloc(kv->value , (kv->count_string)*(sizeof(char*)));
 		} else {
 			kv->value = (char**)malloc(sizeof(char*));
 		}
 	}
-	printf("%s, %d", value, type_index);
 	kv->value[type_index] = value;
 }
 
@@ -250,7 +247,7 @@ void adv_kv_add_obj_arr(adv_kv_obj* kv, char* key, adv_kv_array* arr) {
 	adv_add_key_lks(kv->keyset, key, type, type_index);
 	if (new_allocate) {
 	// adding new object against the key;
-		if (type_index > 1) {
+		if (kv->count_array > 1) {
 			kv->value_list = (adv_kv_array**)realloc(kv->value , (kv->count_array)*(sizeof(adv_kv_array*)));
 		} else {
 			kv->value_list = (adv_kv_array**)malloc(sizeof(adv_kv_array*));
