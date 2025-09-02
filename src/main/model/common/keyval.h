@@ -19,6 +19,9 @@ struct adv_kv_array{
 	adv_kv_obj** obj;
 	adv_kv_array** value_list;
 	char** value;
+	int count_object;
+	int count_array;
+	int count_string;
 };
 
 
@@ -61,31 +64,61 @@ adv_kv_obj* adv_init_kv(int type) {
 }
 
 int adv_kv_fetch_obj_index_type_for_null(adv_kv_obj* kv, int type) {
+	int index = -1;
+	int i;
 	switch (type) {
 		case 0:
-			lks->count_array--;
+			for(i = 0; i < kv->keyset->count_array; i++) {
+				if(kv->value_list[i] == NULL) {
+					index = i;
+				}
+			}
 			break;
 		case 1:
-			lks->count_object--;
+			for(i = 0; i < kv->keyset->count_object; i++) {
+				if(kv->children[i] == NULL) {
+					index = i;
+				}
+			}
 			break;
 		case 2:
-			lks->count_string--;
+			for(i = 0; i < kv->keyset->count_string; i++) {
+				if(kv->value[i] == NULL) {
+					index = i;
+				}
+			}
 			break;
 	}
+	return index;
 }
 
-int adv_kv_fetch_arr_index_type_for_null(adv_kv_array* karr, int type) {
-	switch (type) {
+int adv_kv_fetch_arr_index_type_for_null(adv_kv_array* karr) {
+	int index = -1;
+	int i;
+	switch (karr->type) {
 		case 0:
-			lks->count_array--;
+			for(i = 0; i < karr->count_array; i++) {
+				if(karr->value_list[i] == NULL) {
+					index = i;
+				}
+			}
 			break;
 		case 1:
-			lks->count_object--;
+			for(i = 0; i < karr->count_object; i++) {
+				if(karr->obj[i] == NULL) {
+					index = i;
+				}
+			}
 			break;
 		case 2:
-			lks->count_string--;
+			for(i = 0; i < karr->count_string; i++) {
+				if(karr->value[i] == NULL) {
+					index = i;
+				}
+			}
 			break;
 	}
+	return index;
 }
 
 /// This is all when kv object adding other kv object
