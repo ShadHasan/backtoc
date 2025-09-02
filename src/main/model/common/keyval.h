@@ -186,7 +186,7 @@ void adv_kv_add_obj_obj(adv_kv_obj* kv, char* key, adv_kv_obj* obj) {
 	if (new_allocate) {
 	// adding new object against the key;
 		if (type_index > 1) {
-			kv->children = (adv_kv_obj**)realloc(kv->children , (type_index)*(sizeof(adv_kv_obj*)));
+			kv->children = (adv_kv_obj**)realloc(kv->children , (kv->count_object)*(sizeof(adv_kv_obj*)));
 		} else {
 			kv->children = (adv_kv_obj**)malloc(sizeof(adv_kv_obj*));
 		}
@@ -200,6 +200,7 @@ void adv_kv_add_obj_str(adv_kv_obj* kv, char* key, char* value) {
 	bool new_allocate = false;
 	int type = 2;
 
+	printf("keyindex: %d", key_index_data.index);
 	// deleting(Assign NULL) to children,value_list, value to it index if already existing anything against the key
 	if(key_index_data.index != -1) {
 		int del_type = key_index_data.type;
@@ -218,11 +219,12 @@ void adv_kv_add_obj_str(adv_kv_obj* kv, char* key, char* value) {
 	if (new_allocate) {
 	// adding new object against the key;
 		if (type_index > 1) {
-			kv->value = (char**)realloc(kv->value , (type_index)*(sizeof(char*)));
+			kv->value = (char**)realloc(kv->value , (kv->count_string)*(sizeof(char*)));
 		} else {
 			kv->value = (char**)malloc(sizeof(char*));
 		}
 	}
+	printf("%s, %d", value, type_index);
 	kv->value[type_index] = value;
 }
 
@@ -249,7 +251,7 @@ void adv_kv_add_obj_arr(adv_kv_obj* kv, char* key, adv_kv_array* arr) {
 	if (new_allocate) {
 	// adding new object against the key;
 		if (type_index > 1) {
-			kv->value_list = (adv_kv_array**)realloc(kv->value , (type_index)*(sizeof(adv_kv_array*)));
+			kv->value_list = (adv_kv_array**)realloc(kv->value , (kv->count_array)*(sizeof(adv_kv_array*)));
 		} else {
 			kv->value_list = (adv_kv_array**)malloc(sizeof(adv_kv_array*));
 		}
@@ -273,11 +275,44 @@ void adv_kv_add_arr_obj(adv_kv_array* arr, adv_kv_obj* obj) {
 }
 
 void adv_kv_traverse_obj(adv_kv_obj* kv) {
-
+	adv_l_key_set* keys = kv->keyset->keys;
+	printf("{\n");
+	while (keys != NULL) {
+		printf("%s: ",keys->str );
+		switch (keys->type) {
+			case 0:
+				adv_kv_traverse_obj(kv->children[keys->type_index]);
+				break;
+			case 1:
+				adv_kv_traverse_arr(kv->value_list[keys->type_index]);
+				break;
+			case 2:
+				printf("%s", kv->value[keys->type_index]);
+				break;
+		}
+		printf(",\n");
+		keys = keys->next;
+	}
+	printf("}\n");
+	printf("NULL\n");
 }
 
-void adv_kv_traverse_arr(adv_kv_obj* kv) {
-
+void adv_kv_traverse_arr(adv_kv_array* karr) {
+	int i;
+	printf("[\n");
+	for(i = 0; i < karr->count_array; i++) {
+		adv_kv_traverse_arr(karr->value_list[i]);
+		printf(",\n");
+	}
+	for(i = 0; i < karr->count_object; i++) {
+		adv_kv_traverse_obj(karr->obj[i]);
+		printf(",\n");
+	}
+	for(i = 0; i < karr->count_string; i++) {
+		printf("%s", karr->value[i]);
+		printf(",\n");
+	}
+	printf("]\n");
 }
 
 #endif

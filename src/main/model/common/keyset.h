@@ -127,8 +127,8 @@ adv_lks_index_data adv_index_key_lks(adv_lks_keys* lks, char* str) {
 void adv_traverse_lks(adv_lks_keys* lks) {
 	adv_l_key_set* keys = lks->keys;
 	while (keys != NULL) {
-			printf("(%s, %d, %d)->",keys->str, keys->type, keys->type_index);
-			keys = keys->next;
+		printf("(%s, %d, %d)->",keys->str, keys->type, keys->type_index);
+		keys = keys->next;
 	}
 	printf("NULL\n");
 }
