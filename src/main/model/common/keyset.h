@@ -27,9 +27,6 @@ struct adv_l_key_set {
 
 typedef struct {
 	adv_l_key_set* keys;
-	int count_object;
-	int count_array;
-	int count_string;
 	int count_keys;
 } adv_lks_keys;
 
@@ -58,13 +55,14 @@ void adv_add_key_lks(adv_lks_keys* lks, char* str, int type, int type_index) {
 		adv_l_key_set* t_lks = (adv_l_key_set*)malloc(sizeof(adv_l_key_set));
 		t_lks->next = NULL;
 		t_lks->str = str;
+		t_lks->type = type;
 		t_lks->type_index = type_index;
-
 		if (current_key != NULL) {
 			current_key->next = t_lks;
 		} else {
 			lks->keys = t_lks;
 		}
+		lks->count_keys++;
 	} else {
 		int current_type = keys->type;
 		keys->type = type;
@@ -102,6 +100,7 @@ void adv_del_key_lks(adv_lks_keys* lks, char* str) {
 	}
 	if (found) {
 		free(keys);
+		lks->count_keys--;
 	}
 }
 
