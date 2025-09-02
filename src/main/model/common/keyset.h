@@ -36,42 +36,8 @@ typedef struct {
 adv_lks_keys* adv_init_lks() {
 	adv_lks_keys* lks = (adv_lks_keys*)malloc(sizeof(adv_lks_keys));
 	lks->keys = NULL;
-    lks->count_object = 0;
-    lks->count_keys = 0;
-    lks->count_array = 0;
-    lks->count_string = 0;
+    lks->count_keys = 0;;
     return lks;
-}
-
-void adv_lks_key_inc(adv_lks_keys* lks, adv_l_key_set* t_lks, int type) {
-	switch (type) {
-		case 0:
-			lks->count_array++;
-			t_lks->type = 0;
-			break;
-		case 1:
-			lks->count_object++;
-			t_lks->type = 1;
-			break;
-		case 2:
-			lks->count_string++;
-			t_lks->type = 2;
-			break;
-	}
-}
-
-void adv_lks_key_dec(adv_lks_keys* lks, int type) {
-	switch (type) {
-		case 0:
-			lks->count_array--;
-			break;
-		case 1:
-			lks->count_object--;
-			break;
-		case 2:
-			lks->count_string--;
-			break;
-	}
 }
 
 void adv_add_key_lks(adv_lks_keys* lks, char* str, int type, int type_index) {
@@ -90,7 +56,6 @@ void adv_add_key_lks(adv_lks_keys* lks, char* str, int type, int type_index) {
 	}
 	if (!found) {
 		adv_l_key_set* t_lks = (adv_l_key_set*)malloc(sizeof(adv_l_key_set));
-		adv_lks_key_inc(lks, t_lks, type);
 		t_lks->next = NULL;
 		t_lks->str = str;
 		t_lks->type_index = type_index;
@@ -102,8 +67,6 @@ void adv_add_key_lks(adv_lks_keys* lks, char* str, int type, int type_index) {
 		}
 	} else {
 		int current_type = keys->type;
-		adv_lks_key_dec(lks, current_type);
-		adv_lks_key_inc(lks, keys, type);
 		keys->type = type;
 		keys->type_index = type_index;
 	}
@@ -138,7 +101,6 @@ void adv_del_key_lks(adv_lks_keys* lks, char* str) {
 		count++;
 	}
 	if (found) {
-		adv_lks_key_dec(lks, keys->type);
 		free(keys);
 	}
 }

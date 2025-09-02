@@ -2,6 +2,7 @@
 #define ADVANIEN_COMMON_KEYVAL
 
 #include <stdlib.h>
+#include <stdbool.h>
 #include "model/common/keyset.h"
 #include <string.h>
 
@@ -35,6 +36,9 @@ struct adv_kv_obj {
 	adv_kv_obj** children;     // when type is object
 	adv_kv_array** value_list; // when type is array, then again each element of array can be array, object, string
 	char** value; // when type is string
+	int count_object;
+	int count_array;
+	int count_string;
 };
 
 
@@ -71,6 +75,7 @@ int adv_kv_fetch_obj_index_type_for_null(adv_kv_obj* kv, int type) {
 			for(i = 0; i < kv->keyset->count_array; i++) {
 				if(kv->value_list[i] == NULL) {
 					index = i;
+					break;
 				}
 			}
 			break;
@@ -78,6 +83,7 @@ int adv_kv_fetch_obj_index_type_for_null(adv_kv_obj* kv, int type) {
 			for(i = 0; i < kv->keyset->count_object; i++) {
 				if(kv->children[i] == NULL) {
 					index = i;
+					break;
 				}
 			}
 			break;
@@ -85,6 +91,7 @@ int adv_kv_fetch_obj_index_type_for_null(adv_kv_obj* kv, int type) {
 			for(i = 0; i < kv->keyset->count_string; i++) {
 				if(kv->value[i] == NULL) {
 					index = i;
+					break;
 				}
 			}
 			break;
@@ -100,6 +107,7 @@ int adv_kv_fetch_arr_index_type_for_null(adv_kv_array* karr) {
 			for(i = 0; i < karr->count_array; i++) {
 				if(karr->value_list[i] == NULL) {
 					index = i;
+					break;
 				}
 			}
 			break;
@@ -107,6 +115,7 @@ int adv_kv_fetch_arr_index_type_for_null(adv_kv_array* karr) {
 			for(i = 0; i < karr->count_object; i++) {
 				if(karr->obj[i] == NULL) {
 					index = i;
+					break;
 				}
 			}
 			break;
@@ -114,6 +123,7 @@ int adv_kv_fetch_arr_index_type_for_null(adv_kv_array* karr) {
 			for(i = 0; i < karr->count_string; i++) {
 				if(karr->value[i] == NULL) {
 					index = i;
+					break;
 				}
 			}
 			break;
@@ -124,19 +134,22 @@ int adv_kv_fetch_arr_index_type_for_null(adv_kv_array* karr) {
 /// This is all when kv object adding other kv object
 void adv_kv_add_obj_to_obj(adv_kv_obj* kv, char* key, adv_kv_obj* obj) {
 	adv_lks_index_data index = adv_index_key_lks(kv->keyset, key);
+	bool allocate = false;
 	int type = 1;
 
-	// Not TODO First check children of type object have null value. Take that is as type index else use count_object as type_index.
-	int type_index = kv->keyset->count_object;
+	// First check children of type object have null value. Take that is as type index else use count_object as type_index.
+	int type_index = adv_kv_fetch_obj_index_type_for_null(kv, type);
+	if (type_index == -1) {
+		type_index = kv->keyset->count_object;
+	}
 	adv_add_key_lks(keyset, key, type, type_index);
 	// adding new object against the key;
 	if (type_index > 0) {
 		kv->children = (kv->children**)realloc(*kv->children , (type_index+1)*(sizeof(kv->children*)));
-		kv->children[type_index] = obj;
 	} else {
 		kv->children = (kv->children**)malloc(sizeof(kv->children*));
-		kv->children[type_index] = obj;
 	}
+	kv->children[type_index] = obj;
 	// deleting(Assign NULL) to children,value_list, value to it index if already existing anything against the key
 }
 
