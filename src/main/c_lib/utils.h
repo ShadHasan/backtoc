@@ -74,9 +74,7 @@ bool validate_json(char* json_str){
 	char* ts = (char*)malloc(sizeof(char));
 	ts[0] = '\0';
 
-	adv_char_stack* c_stack = malloc(sizeof(adv_char_stack));
-	c_stack->c = NULL;
-	c_stack->size = 0;
+	adv_char_stack* c_stack = init_adv_char_stack();
 	for(i=0;i<len;i++) {
 
 		if (c_stack->size > 0)

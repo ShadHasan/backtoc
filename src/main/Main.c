@@ -61,7 +61,7 @@ int main()
 	// Testing kernel map loading
 
 
-	// Verify stack feature
+	// verify stack feature
 	stack_char_test();
 
 	// kv ds testing

@@ -25,7 +25,7 @@ struct adv_kv_array{
 struct adv_kv_obj {
 	// key list blueprint. It helps to keep track of used key.
 	// Hence used to prevent duplicate key for data structure
-	adv_lks_keys* keys;
+	adv_lks_keys* keyset;
 
 	short type; // array 0, object 1, string 2
 
@@ -47,11 +47,11 @@ adv_kv_obj* adv_init_kv(int type) {
 
 	// Root object
 	adv_kv_obj* obj = (adv_kv_obj*)malloc(sizeof(adv_kv_obj));
+	obj->type = type;
 
 	// initializing root key with given type
-	obj->keys = (adv_lks_keys*)malloc(sizeof(adv_lks_keys));
-	adv_init_lks(obj->keys);
-	adv_add_key_with_attr_lks(obj->keys,"(0)", type, 0);
+	obj->keyset = adv_init_lks();
+	adv_add_key_lks(obj->keyset, "(0)", type);
 
 	obj->children = NULL;
 	obj->value_list = NULL;
@@ -62,10 +62,20 @@ adv_kv_obj* adv_init_kv(int type) {
 
 /// This is all when kv object adding other kv object
 void add_obj_to_adv_kv_obj(adv_kv_obj* kv, char* key, adv_kv_obj* obj) {
-	adv_index_data index = adv_index_key_lks(kv->keys, key);
-	if (index.index < 0) {
-		adv_add_key_lks(obj->keys, key);
+	adv_lks_index_data index = adv_index_key_lks(kv->keyset, key);
+	int type = 1;
+	// First check children of type object have null value. Take that is as type index else use count_object as type_index.
+	int type_index = kv->keyset->count_object;
+	adv_add_key_lks(keyset, key, type, type_index);
+	// adding new object against the key;
+	if (type_index > 0) {
+		kv->children = (kv->children**)realloc(*kv->children , (type_index+1)*(sizeof(kv->children*)));
+		kv->children[type_index] = obj;
+	} else {
+		kv->children = (kv->children**)malloc(sizeof(kv->children*));
+		kv->children[type_index] = obj;
 	}
+	// deleting if already existing anything existing against the key
 }
 
 void add_str_to_adv_kv_obj(adv_kv_obj* kv, char* key, char* value) {

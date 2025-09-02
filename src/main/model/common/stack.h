@@ -10,12 +10,10 @@ struct adv_char_stack {
 	int size;
 };
 
-adv_char_stack* init_adv_char_stack(char c) {
-	adv_char_stack* stack;
+adv_char_stack* init_adv_char_stack() {
+	adv_char_stack* stack = malloc(sizeof(adv_char_stack));
+	stack->c = NULL;
 	stack->size = 0;
-	stack->c = (char*)malloc(sizeof(char));
-	stack->c[0] = c;
-	stack->size++;
 	return stack;
 }
 

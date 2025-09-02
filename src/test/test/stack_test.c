@@ -2,9 +2,7 @@
 
 void stack_char_test() {
 	char c;
-	adv_char_stack* c_stack = malloc(sizeof(adv_char_stack));
-	c_stack->c = NULL;
-	c_stack->size = 0;
+	adv_char_stack* c_stack = init_adv_char_stack();
 	push_adv_char_stack(c_stack, 'f');
 	push_adv_char_stack(c_stack, 'i');
 	push_adv_char_stack(c_stack, 'r');
