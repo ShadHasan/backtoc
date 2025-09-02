@@ -30,5 +30,7 @@ void kv_test() {
 
 	// initialize as object
 	adv_kv_obj* root_kv_obj = adv_kv_init_obj();
+	adv_kv_add_obj_str(root_kv_obj, "key1", "value1");
+	adv_kv_add_obj_str(root_kv_obj, "key2", "value2");
 	// adv_kv_obj* root_kv_array = adv_init_kv(0);
 }

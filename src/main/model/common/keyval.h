@@ -163,7 +163,7 @@ void adv_kv_set_obj_index_type_null(adv_kv_obj* kv, int type, int type_index) {
 }
 
 /// This is all when kv object adding other kv object
-void adv_kv_add_obj_to_obj(adv_kv_obj* kv, char* key, adv_kv_obj* obj) {
+void adv_kv_add_obj_obj(adv_kv_obj* kv, char* key, adv_kv_obj* obj) {
 	adv_lks_index_data key_index_data = adv_index_key_lks(kv->keyset, key);
 	bool new_allocate = false;
 	int type = 1;
@@ -195,7 +195,7 @@ void adv_kv_add_obj_to_obj(adv_kv_obj* kv, char* key, adv_kv_obj* obj) {
 
 }
 
-void adv_kv_add_obj_to_str(adv_kv_obj* kv, char* key, char* value) {
+void adv_kv_add_obj_str(adv_kv_obj* kv, char* key, char* value) {
 	adv_lks_index_data key_index_data = adv_index_key_lks(kv->keyset, key);
 	bool new_allocate = false;
 	int type = 2;
@@ -226,7 +226,7 @@ void adv_kv_add_obj_to_str(adv_kv_obj* kv, char* key, char* value) {
 	kv->value[type_index] = value;
 }
 
-void adv_kv_add_obj_to_arr(adv_kv_obj* kv, char* key, adv_kv_array* arr) {
+void adv_kv_add_obj_arr(adv_kv_obj* kv, char* key, adv_kv_array* arr) {
 	adv_lks_index_data key_index_data = adv_index_key_lks(kv->keyset, key);
 	bool new_allocate = false;
 	int type = 0;
@@ -257,28 +257,27 @@ void adv_kv_add_obj_to_arr(adv_kv_obj* kv, char* key, adv_kv_array* arr) {
 	kv->value_list[type_index] = arr;
 }
 
-// This is the end  when root kv is of object type
 
-
-/// This is all when root kv is of array type
-
-// This is the end  when root kv is of array type
-
-
-/// This is all when adding element to array type "kv"
-void add_str_array_to_adv_kv_arr(adv_kv_obj* kv, char* value) {
+/// This is all when adding element to "kv" array type
+void adv_kv_add_arr_arr(adv_kv_array* arr, adv_kv_array* narr) {
 
 }
 
 // this is nested array
-void add_array_array_to_adv_kv_arr(adv_kv_obj* kv, adv_kv_array* arr) {
+void adv_kv_add_arr_str(adv_kv_array* arr, char* str) {
 
 }
 
-void add_object_array_to_adv_kv_arr(adv_kv_obj* kv, adv_kv_obj* obj) {
+void adv_kv_add_arr_obj(adv_kv_array* arr, adv_kv_obj* obj) {
 
 }
 
-// This is the end of adding element when "kv" is of array type
+void adv_kv_traverse_obj(adv_kv_obj* kv) {
+
+}
+
+void adv_kv_traverse_arr(adv_kv_obj* kv) {
+
+}
 
 #endif
