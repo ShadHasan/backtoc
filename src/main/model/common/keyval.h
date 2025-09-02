@@ -58,7 +58,6 @@ adv_kv_obj* adv_init_kv(int type) {
 
 	// initializing root key with given type
 	obj->keyset = adv_init_lks();
-	adv_add_key_lks(obj->keyset, "(0)", type);
 
 	obj->children = NULL;
 	obj->value_list = NULL;
@@ -168,8 +167,16 @@ void adv_kv_add_obj_to_obj(adv_kv_obj* kv, char* key, adv_kv_obj* obj) {
 	bool new_allocate = false;
 	int type = 1;
 
+	// deleting(Assign NULL) to children,value_list, value to it index if already existing anything against the key
+	if(key_index_data.index != -1) {
+		int del_type = key_index_data.type;
+		int del_type_index = key_index_data.type_index;
+		adv_kv_set_obj_index_type_null(kv, del_type, del_type_index);
+	}
+
 	// First check children of type object have null value. Take that is as type index else use count_object as type_index.
 	int type_index = adv_kv_fetch_obj_index_type_for_null(kv, type);
+
 	if (type_index == -1) {
 		new_allocate = true;
 		type_index = kv->count_object++;
@@ -178,26 +185,20 @@ void adv_kv_add_obj_to_obj(adv_kv_obj* kv, char* key, adv_kv_obj* obj) {
 	if (new_allocate) {
 	// adding new object against the key;
 		if (type_index > 1) {
-			kv->children = (kv->children**)realloc(*kv->children , (type_index)*(sizeof(kv->children*)));
+			kv->children = (adv_kv_obj**)realloc(kv->children , (type_index)*(sizeof(adv_kv_obj*)));
 		} else {
-			kv->children = (kv->children**)malloc(sizeof(kv->children*));
+			kv->children = (adv_kv_obj**)malloc(sizeof(adv_kv_obj*));
 		}
 	}
 	kv->children[type_index] = obj;
 
-	// deleting(Assign NULL) to children,value_list, value to it index if already existing anything against the key
-	if(key_index_data.index != -1) {
-		int del_type = key_index_data.type;
-		int del_type_index = key_index_data.type_index;
-		adv_kv_set_obj_index_type_null(kv, del_type, del_type_index);
-	}
 }
 
-void add_str_to_adv_kv_obj(adv_kv_obj* kv, char* key, char* value) {
+void adv_kv_add_obj_to_str(adv_kv_obj* kv, char* key, char* value) {
 
 }
 
-void add_arr_to_adv_kv_obj(adv_kv_obj* kv, char* key, adv_kv_array* arr) {
+void adv_kv_add_obj_to_arr(adv_kv_obj* kv, char* key, adv_kv_array* arr) {
 
 }
 

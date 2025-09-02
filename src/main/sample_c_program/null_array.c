@@ -4,7 +4,7 @@
 int main() {
         char** array;
         int i;
-        array = (char**)malloc(3*sizeof(char**));
+        array = (char**)malloc(3*sizeof(char*));
 
         array[0] = "hello";
         array[1] = NULL;

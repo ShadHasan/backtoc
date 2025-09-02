@@ -1,5 +1,5 @@
 #include <stdio.h>
-// #include "model/common/keyval.h"
+#include "model/common/keyval.h"
 #include "model/common/keyset.h"
 
 void kv_test() {
@@ -29,6 +29,6 @@ void kv_test() {
 	printf("count keys: %d\n", keyset->count_keys);
 
 	// initialize as object
-	// adv_kv_obj* root_kv_obj = adv_init_kv(1);
+	adv_kv_obj* root_kv_obj = adv_init_kv(1);
 	// adv_kv_obj* root_kv_array = adv_init_kv(0);
 }
