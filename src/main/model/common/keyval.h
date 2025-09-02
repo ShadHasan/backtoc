@@ -60,11 +60,40 @@ adv_kv_obj* adv_init_kv(int type) {
 	return obj;
 }
 
+int adv_kv_fetch_obj_index_type_for_null(adv_kv_obj* kv, int type) {
+	switch (type) {
+		case 0:
+			lks->count_array--;
+			break;
+		case 1:
+			lks->count_object--;
+			break;
+		case 2:
+			lks->count_string--;
+			break;
+	}
+}
+
+int adv_kv_fetch_arr_index_type_for_null(adv_kv_array* karr, int type) {
+	switch (type) {
+		case 0:
+			lks->count_array--;
+			break;
+		case 1:
+			lks->count_object--;
+			break;
+		case 2:
+			lks->count_string--;
+			break;
+	}
+}
+
 /// This is all when kv object adding other kv object
-void add_obj_to_adv_kv_obj(adv_kv_obj* kv, char* key, adv_kv_obj* obj) {
+void adv_kv_add_obj_to_obj(adv_kv_obj* kv, char* key, adv_kv_obj* obj) {
 	adv_lks_index_data index = adv_index_key_lks(kv->keyset, key);
 	int type = 1;
-	// First check children of type object have null value. Take that is as type index else use count_object as type_index.
+
+	// Not TODO First check children of type object have null value. Take that is as type index else use count_object as type_index.
 	int type_index = kv->keyset->count_object;
 	adv_add_key_lks(keyset, key, type, type_index);
 	// adding new object against the key;
@@ -75,7 +104,7 @@ void add_obj_to_adv_kv_obj(adv_kv_obj* kv, char* key, adv_kv_obj* obj) {
 		kv->children = (kv->children**)malloc(sizeof(kv->children*));
 		kv->children[type_index] = obj;
 	}
-	// deleting if already existing anything existing against the key
+	// deleting(Assign NULL) to children,value_list, value to it index if already existing anything against the key
 }
 
 void add_str_to_adv_kv_obj(adv_kv_obj* kv, char* key, char* value) {
