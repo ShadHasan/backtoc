@@ -29,6 +29,6 @@ void kv_test() {
 	printf("count keys: %d\n", keyset->count_keys);
 
 	// initialize as object
-	adv_kv_obj* root_kv_obj = adv_init_kv(1);
+	adv_kv_obj* root_kv_obj = adv_kv_init_obj();
 	// adv_kv_obj* root_kv_array = adv_init_kv(0);
 }

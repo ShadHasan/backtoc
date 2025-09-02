@@ -16,7 +16,6 @@ typedef struct adv_kv_array adv_kv_array;
 // array each instance blueprint
 // please note array can have nested array
 struct adv_kv_array{
-	short type; // array 0, object 1, string 2
 	adv_kv_obj** obj;
 	adv_kv_array** value_list;
 	char** value;
@@ -29,9 +28,7 @@ struct adv_kv_array{
 struct adv_kv_obj {
 	// key list blueprint. It helps to keep track of used key.
 	// Hence used to prevent duplicate key for data structure
-	adv_lks_keys* keyset;
-
-	short type; // array 0, object 1, string 2
+	adv_lks_keys* keyset;  // keyset manages type  array 0, object 1, string 2
 
 	adv_kv_obj** children;     // when type is object
 	adv_kv_array** value_list; // when type is array, then again each element of array can be array, object, string
@@ -45,16 +42,9 @@ struct adv_kv_obj {
 // Initialize key value as a root element
 // root keyval is alway of type object. It value may be array, object, string etc
 // but root itself is a object
-adv_kv_obj* adv_init_kv(int type) {
-	// type can be array 0, object 1 even though string is 2,
-	// we cannot initialized with string hence other than 0, 1 will return NULL
-	if (type <0 && type > 1) {
-		return NULL;
-	}
-
+adv_kv_obj* adv_kv_init_obj() {
 	// Root object
 	adv_kv_obj* obj = (adv_kv_obj*)malloc(sizeof(adv_kv_obj));
-	obj->type = type;
 
 	// initializing root key with given type
 	obj->keyset = adv_init_lks();
@@ -67,6 +57,17 @@ adv_kv_obj* adv_init_kv(int type) {
 	obj->count_string = 0;
 
 	return obj;
+}
+
+adv_kv_array* adv_kv_init_arr() {
+	adv_kv_array* karr = (adv_kv_array*)malloc(sizeof(adv_kv_array));
+
+	karr->obj = NULL;
+	karr->value_list = NULL;
+	karr->value = NULL;
+	karr->count_object = 0;
+	karr->count_array = 0;
+	karr->count_string = 0;
 }
 
 int adv_kv_fetch_obj_index_type_for_null(adv_kv_obj* kv, int type) {
@@ -101,10 +102,10 @@ int adv_kv_fetch_obj_index_type_for_null(adv_kv_obj* kv, int type) {
 	return index;
 }
 
-int adv_kv_fetch_arr_index_type_for_null(adv_kv_array* karr) {
+int adv_kv_fetch_arr_index_type_for_null(adv_kv_array* karr, int type) {
 	int index = -1;
 	int i;
-	switch (karr->type) {
+	switch (type) {
 		case 0:
 			for(i = 0; i < karr->count_array; i++) {
 				if(karr->value_list[i] == NULL) {
@@ -195,11 +196,65 @@ void adv_kv_add_obj_to_obj(adv_kv_obj* kv, char* key, adv_kv_obj* obj) {
 }
 
 void adv_kv_add_obj_to_str(adv_kv_obj* kv, char* key, char* value) {
+	adv_lks_index_data key_index_data = adv_index_key_lks(kv->keyset, key);
+	bool new_allocate = false;
+	int type = 2;
 
+	// deleting(Assign NULL) to children,value_list, value to it index if already existing anything against the key
+	if(key_index_data.index != -1) {
+		int del_type = key_index_data.type;
+		int del_type_index = key_index_data.type_index;
+		adv_kv_set_obj_index_type_null(kv, del_type, del_type_index);
+	}
+
+	// First check children of type object have null value. Take that is as type index else use count_object as type_index.
+	int type_index = adv_kv_fetch_obj_index_type_for_null(kv, type);
+
+	if (type_index == -1) {
+		new_allocate = true;
+		type_index = kv->count_string++;
+	}
+	adv_add_key_lks(kv->keyset, key, type, type_index);
+	if (new_allocate) {
+	// adding new object against the key;
+		if (type_index > 1) {
+			kv->value = (char**)realloc(kv->value , (type_index)*(sizeof(char*)));
+		} else {
+			kv->value = (char**)malloc(sizeof(char*));
+		}
+	}
+	kv->value[type_index] = value;
 }
 
 void adv_kv_add_obj_to_arr(adv_kv_obj* kv, char* key, adv_kv_array* arr) {
+	adv_lks_index_data key_index_data = adv_index_key_lks(kv->keyset, key);
+	bool new_allocate = false;
+	int type = 0;
 
+	// deleting(Assign NULL) to children,value_list, value to it index if already existing anything against the key
+	if(key_index_data.index != -1) {
+		int del_type = key_index_data.type;
+		int del_type_index = key_index_data.type_index;
+		adv_kv_set_obj_index_type_null(kv, del_type, del_type_index);
+	}
+
+	// First check children of type array have null value. Take that is as type index else use count_array as type_index.
+	int type_index = adv_kv_fetch_obj_index_type_for_null(kv, type);
+
+	if (type_index == -1) {
+		new_allocate = true;
+		type_index = kv->count_array++;
+	}
+	adv_add_key_lks(kv->keyset, key, type, type_index);
+	if (new_allocate) {
+	// adding new object against the key;
+		if (type_index > 1) {
+			kv->value_list = (adv_kv_array**)realloc(kv->value , (type_index)*(sizeof(adv_kv_array*)));
+		} else {
+			kv->value_list = (adv_kv_array**)malloc(sizeof(adv_kv_array*));
+		}
+	}
+	kv->value_list[type_index] = arr;
 }
 
 // This is the end  when root kv is of object type
