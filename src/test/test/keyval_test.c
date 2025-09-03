@@ -36,5 +36,10 @@ void kv_test() {
 	adv_kv_traverse_obj(root_kv_obj);
 	adv_kv_add_obj_str(root_kv_obj, "key3", "value3");
 	adv_kv_traverse_obj(root_kv_obj);
-	// adv_kv_obj* root_kv_array = adv_init_kv(0);
+
+	// initialize as array
+	adv_kv_obj* kv_array_1 = adv_kv_init_arr();
+	adv_kv_add_obj_arr(root_kv_obj, "key4", kv_array_1);
+	adv_kv_traverse_arr(kv_array_1);
+	adv_kv_traverse_obj(root_kv_obj);
 }

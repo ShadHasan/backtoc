@@ -11,6 +11,8 @@
 // like json datastructure
 typedef struct adv_kv_obj adv_kv_obj;
 typedef struct adv_kv_array adv_kv_array;
+void adv_kv_traverse_arr(adv_kv_array* karr);
+void adv_kv_traverse_obj(adv_kv_obj* kv);
 
 
 // array each instance blueprint
@@ -68,6 +70,8 @@ adv_kv_array* adv_kv_init_arr() {
 	karr->count_object = 0;
 	karr->count_array = 0;
 	karr->count_string = 0;
+
+	return karr;
 }
 
 int adv_kv_fetch_obj_index_type_for_null(adv_kv_obj* kv, int type) {
@@ -248,7 +252,7 @@ void adv_kv_add_obj_arr(adv_kv_obj* kv, char* key, adv_kv_array* arr) {
 	if (new_allocate) {
 	// adding new object against the key;
 		if (kv->count_array > 1) {
-			kv->value_list = (adv_kv_array**)realloc(kv->value , (kv->count_array)*(sizeof(adv_kv_array*)));
+			kv->value_list = (adv_kv_array**)realloc(kv->value_list , (kv->count_array)*(sizeof(adv_kv_array*)));
 		} else {
 			kv->value_list = (adv_kv_array**)malloc(sizeof(adv_kv_array*));
 		}
@@ -259,16 +263,67 @@ void adv_kv_add_obj_arr(adv_kv_obj* kv, char* key, adv_kv_array* arr) {
 
 /// This is all when adding element to "kv" array type
 void adv_kv_add_arr_arr(adv_kv_array* arr, adv_kv_array* narr) {
+	int type = 0;
+	bool new_allocate = false;
+	int type_index = adv_kv_fetch_arr_index_type_for_null(arr, type);
 
+	if (type_index == -1) {
+		new_allocate = true;
+		type_index = arr->count_array++;
+	}
+
+	if (new_allocate) {
+	// adding new object against the key;
+		if (arr->count_array > 1) {
+			arr->value_list = (adv_kv_array**)realloc(arr->value_list , (arr->count_array)*(sizeof(adv_kv_array*)));
+		} else {
+			arr->value_list = (adv_kv_array**)malloc(sizeof(adv_kv_array*));
+		}
+	}
+	arr->value_list[type_index] = narr;
 }
 
 // this is nested array
 void adv_kv_add_arr_str(adv_kv_array* arr, char* str) {
+	int type = 2;
+	bool new_allocate = false;
+	int type_index = adv_kv_fetch_arr_index_type_for_null(arr, type);
 
+	if (type_index == -1) {
+		new_allocate = true;
+		type_index = arr->count_string++;
+	}
+
+	if (new_allocate) {
+	// adding new object against the key;
+		if (arr->count_string > 1) {
+			arr->value = (char**)realloc(arr->value_list , (arr->count_string)*(sizeof(char*)));
+		} else {
+			arr->value = (char**)malloc(sizeof(char*));
+		}
+	}
+	arr->value[type_index] = str;
 }
 
 void adv_kv_add_arr_obj(adv_kv_array* arr, adv_kv_obj* obj) {
+	int type = 1;
+	bool new_allocate = false;
+	int type_index = adv_kv_fetch_arr_index_type_for_null(arr, type);
 
+	if (type_index == -1) {
+		new_allocate = true;
+		type_index = arr->count_object++;
+	}
+
+	if (new_allocate) {
+	// adding new object against the key;
+		if (arr->count_object > 1) {
+			arr->obj = (adv_kv_obj**)realloc(arr->value_list , (arr->count_object)*(sizeof(adv_kv_obj*)));
+		} else {
+			arr->obj = (adv_kv_obj**)malloc(sizeof(adv_kv_obj*));
+		}
+	}
+	arr->obj[type_index] = obj;
 }
 
 void adv_kv_traverse_obj(adv_kv_obj* kv) {
@@ -278,10 +333,10 @@ void adv_kv_traverse_obj(adv_kv_obj* kv) {
 		printf("%s: ",keys->str );
 		switch (keys->type) {
 			case 0:
-				adv_kv_traverse_obj(kv->children[keys->type_index]);
+				adv_kv_traverse_arr(kv->value_list[keys->type_index]);
 				break;
 			case 1:
-				adv_kv_traverse_arr(kv->value_list[keys->type_index]);
+				adv_kv_traverse_obj(kv->children[keys->type_index]);
 				break;
 			case 2:
 				printf("%s", kv->value[keys->type_index]);
