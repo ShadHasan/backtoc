@@ -39,7 +39,27 @@ void kv_test() {
 
 	// initialize as array
 	adv_kv_obj* kv_array_1 = adv_kv_init_arr();
+
+	// adding array to object type
 	adv_kv_add_obj_arr(root_kv_obj, "key4", kv_array_1);
 	adv_kv_traverse_arr(kv_array_1);
 	adv_kv_traverse_obj(root_kv_obj);
+
+	// adding string to array type
+	adv_kv_add_arr_str(kv_array_1, "value1");
+	adv_kv_add_arr_str(kv_array_1, "value2");
+	adv_kv_traverse_obj(root_kv_obj);
+
+	// adding same object to object against new key
+	// Don't try because key5 will create loop
+	// adv_kv_add_obj_obj(root_kv_obj, "key5", root_kv_obj);
+	// adv_kv_traverse_obj(root_kv_obj);
+
+	adv_kv_obj* kv_obj_1 = adv_kv_init_obj();
+	adv_kv_add_obj_str(kv_obj_1, "key1", "value1");
+	adv_kv_add_obj_str(kv_obj_1, "key2", "value2");
+	adv_kv_add_obj_obj(root_kv_obj, "key5", kv_obj_1);
+	printf("=========");
+	adv_kv_traverse_obj(root_kv_obj);
+	printf("=========");
 }

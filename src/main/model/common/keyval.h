@@ -297,7 +297,7 @@ void adv_kv_add_arr_str(adv_kv_array* arr, char* str) {
 	if (new_allocate) {
 	// adding new object against the key;
 		if (arr->count_string > 1) {
-			arr->value = (char**)realloc(arr->value_list , (arr->count_string)*(sizeof(char*)));
+			arr->value = (char**)realloc(arr->value , (arr->count_string)*(sizeof(char*)));
 		} else {
 			arr->value = (char**)malloc(sizeof(char*));
 		}
@@ -318,7 +318,7 @@ void adv_kv_add_arr_obj(adv_kv_array* arr, adv_kv_obj* obj) {
 	if (new_allocate) {
 	// adding new object against the key;
 		if (arr->count_object > 1) {
-			arr->obj = (adv_kv_obj**)realloc(arr->value_list , (arr->count_object)*(sizeof(adv_kv_obj*)));
+			arr->obj = (adv_kv_obj**)realloc(arr->obj , (arr->count_object)*(sizeof(adv_kv_obj*)));
 		} else {
 			arr->obj = (adv_kv_obj**)malloc(sizeof(adv_kv_obj*));
 		}
@@ -346,7 +346,6 @@ void adv_kv_traverse_obj(adv_kv_obj* kv) {
 		keys = keys->next;
 	}
 	printf("}\n");
-	printf("NULL\n");
 }
 
 void adv_kv_traverse_arr(adv_kv_array* karr) {
