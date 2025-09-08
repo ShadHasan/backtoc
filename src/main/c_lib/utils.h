@@ -9,12 +9,15 @@ typedef struct adv_depth adv_depth;
 
 struct adv_depth {
 	int current_depth;
-	int current_depth_type;
+	int current_depth_type; // array 0 object 1 and string 2
 	int* depth_element_count;
 	char** depth_temp_key;
-	char** depth_temp_value;
-	int depth_type; // array 0 object 1 and string 2
 	int allocated;
+
+	// for each depth either there is object, array and value
+	adv_kv_obj** obj;
+	adv_kv_obj** arr;
+	char** depth_temp_value;
 };
 
 void tstring(char* ts, char c) {

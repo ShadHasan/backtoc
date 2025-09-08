@@ -17,7 +17,7 @@ void adv_kv_traverse_obj(adv_kv_obj* kv);
 
 // array each instance blueprint
 // please note array can have nested array
-struct adv_kv_array{
+struct adv_kv_array {
 	adv_kv_obj** obj;
 	adv_kv_array** value_list;
 	char** value;
