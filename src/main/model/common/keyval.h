@@ -40,6 +40,12 @@ struct adv_kv_obj {
 	int count_string;
 };
 
+struct adv_kv_or_a {
+	int type;     // type  array 0, object 1
+	adv_kv_obj obj;
+	adv_kv_array arr;
+}
+
 
 // Initialize key value as a root element
 // root keyval is alway of type object. It value may be array, object, string etc

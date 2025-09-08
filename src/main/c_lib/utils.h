@@ -13,6 +13,7 @@ struct adv_depth {
 	int* depth_element_count;
 	char** depth_temp_key;
 	char** depth_temp_value;
+	int depth_type; // array 0 object 1 and string 2
 	int allocated;
 };
 
@@ -202,6 +203,156 @@ bool validate_json(char* json_str){
 	return (!invalid);
 }
 
-// on top of stack
+
+// otop: on top of stack
+adv_kv_or_a* parse_json(char* json_str){
+	adv_kv_or_a* collective = (adv_kv_or_a*)malloc(sizeof(adv_kv_or_a));
+	bool invalid = false;
+	int i;
+
+	int len = strlen(json_str);
+
+	char c, poped_c;
+	bool isKey = true;
+	short type;  // array 0, object 1, string 2
+
+	// current level of depth which is root represent
+	// as 0 in json tree which have only one element
+	adv_depth *depth = malloc(sizeof(depth));
+	depth->current_depth = 0;
+	depth->allocated = 1;
+	depth->depth_element_count = (int*)malloc(sizeof(int));
+	depth->depth_element_count[0] = 1;
+
+	char* ts = (char*)malloc(sizeof(char));
+	ts[0] = '\0';
+
+	adv_char_stack* c_stack = init_adv_char_stack();
+	for(i=0;i<len;i++) {
+
+		if (c_stack->size > 0)
+			c = seek_adv_char_stack(c_stack);
+		else
+			c = '*';
+
+		switch(json_str[i]) {
+			case '{':
+				if (c != '"') {   // if " is not otos. Not string literal but json syntax
+					push_adv_char_stack(c_stack, '{');
+					isKey = true;
+					// TODO: Here initialize kv object
+					depth->current_depth++;
+				}
+				break;
+			case '[':
+				if (c != '"') {   // if " is not otos. Not string literal but json syntax
+					push_adv_char_stack(c_stack, '[');
+					// TODO: here initialize new kv array
+					isKey = false;
+					depth->current_depth++;
+				}
+				break;
+			case '"':
+				if (c != '"') {   // if " is not otos. Not string literal but json syntax
+					push_adv_char_stack(c_stack, '"');
+				} else {
+					poped_c = pop_adv_char_stack(c_stack);
+					// here get the key in ts if isKey "true" else value
+					switch(c) {
+						case '{':
+							// key or value
+							break;
+						case '[':
+							// value
+							break;
+					}
+					set_depth_element(depth);
+				}
+				break;
+			case '}':
+				if (c != '"') {   // if " is not otos. Not string literal but json syntax
+					if (c != '{') {
+						invalid = true;
+					} else {
+						poped_c = pop_adv_char_stack(c_stack);
+						// Todo: here link kv object to predecessor
+						free_tstring(ts);
+						reset_depth_element(depth);
+						depth->current_depth--;
+					}
+				}
+				break;
+			case ']':
+				if (c != '"') {   // if " is not otos. Not string literal but json syntax
+					if (c != '[') {
+						invalid = true;
+					} else {
+						poped_c = pop_adv_char_stack(c_stack);
+						// Todo: here link kv array to predecessor
+						free_tstring(ts);
+						reset_depth_element(depth);
+						depth->current_depth--;
+					}
+				}
+				break;
+			case ':':    // Time to separate key from its value
+				if(!isKey) {
+					invalid = true; // value do not have followed value, only key have value.
+				} else {
+					if (c != '"') {  // if " is not on top of stack. It is not string literal but json syntax and it is key but value.
+						isKey = false;
+						// TODO: here push string kv object keys
+						free_tstring(ts);
+					} else {
+						if (c == '[') {   // if c is [(array) it does not expect semicolon
+							invalid = true;
+						}
+					}
+				}
+				break;
+			case ',':
+				if (c != '"') {  // if " is not otos. Not string literal but json syntax and it is either next key-value or value of an array
+					// TODO: invalid if current kv object or array does not have any value or key-value
+					if (depth->depth_element_count[depth->current_depth] == 0) {
+						invalid = true;
+					} else {
+						reset_depth_element(depth);
+						switch(c) {
+						case '{':
+							if (isKey){
+								// TODO: store ts as temp_key for current kv object and pushed to kv object when value is determined.
+							} else {
+								// TODO: push ts as values with keys in temp_key as a key to current kv object
+							}
+							isKey = true;
+							break;
+						case '[':
+							// TODO: push value to current kv array
+							isKey = false;
+							break;
+						}
+						free_tstring(ts);
+					}
+				}
+				break;
+			default:
+				if (c == '"') {
+					tstring(ts, json_str[i]);
+				}
+				break;
+		}
+
+		if (invalid) {
+			printf("\n Error at char: '%c', index: %d, stack: %c, ts: %s\n", json_str[i], i, c, ts);
+			break;
+		}
+	}
+	if(c_stack->size > 0) {
+		invalid = true;
+		printf("\n Error at dangling syntax stack %d, char: %c", c_stack->size, seek_adv_char_stack(c_stack));
+	}
+
+	return collective;
+}
 
 #endif
