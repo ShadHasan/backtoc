@@ -40,11 +40,11 @@ struct adv_kv_obj {
 	int count_string;
 };
 
-struct adv_kv_or_a {
+typedef struct {
 	int type;     // type  array 0, object 1
 	adv_kv_obj obj;
 	adv_kv_array arr;
-}
+} adv_kv_or_a;
 
 
 // Initialize key value as a root element

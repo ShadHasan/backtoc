@@ -3,6 +3,7 @@
 
 #include <stdbool.h>
 #include <string.h>
+#include "model/common/keyval.h"
 #include "model/common/stack.h"
 
 typedef struct adv_json_depth adv_json_depth;
@@ -31,7 +32,8 @@ struct kv_multi_type_stack {
 	char* single_char;
 
 	int* type_track;  // array 0, object 1, key 2, value 3, single char 4
-	int type_allocated;
+	int type_allocated;  // keep track of type_track allocated memory.
+	int stack_size;     // keep track of current stack size
 
 	int allocated_0;
 	int type_0_size;
@@ -44,7 +46,6 @@ struct kv_multi_type_stack {
 	int allocated_4;
 	int type_4_size;
 
-	int stack_size;
 };
 
 void push_to_kv_multi_stack(adv_json_depth* depth_tracer, adv_kv_obj* obj, adv_kv_array* arr, char* key, char* value) {
@@ -123,16 +124,16 @@ void pop_to_kv_multi_stack(adv_json_depth* depth_tracer, adv_kv_obj* obj, adv_kv
 	int type = kmts->type_track[kmts->stack_size-1];
 	switch(type) {
 		case 0:
-			arr = kmts->arr[kmts->type_0_size]
+			arr = kmts->arr[kmts->type_0_size];
 			break;
 		case 1:
-			obj = kmts->obj[kmts->type_1_size]
+			obj = kmts->obj[kmts->type_1_size];
 			break;
 		case 2:
-			key = kmts->temp_key[kmts->type_2_size]
+			key = kmts->temp_key[kmts->type_2_size];
 			break;
 		case 3:
-			value = kmts->temp_value[kmts->type_3_size]
+			value = kmts->temp_value[kmts->type_3_size];
 			break;
 	}
 	kmts->stack_size--;
@@ -140,7 +141,7 @@ void pop_to_kv_multi_stack(adv_json_depth* depth_tracer, adv_kv_obj* obj, adv_kv
 
 
 adv_json_depth* init_adv_json_depth() {
-	adv_json_depth *depth = malloc(sizeof(depth));
+	adv_json_depth *depth = malloc(sizeof(adv_json_depth));
 	depth->current_depth = 0;
 	depth->allocated = 1;
 	depth->depth_element = (int*)malloc(sizeof(int));
@@ -172,8 +173,9 @@ void tstring(char* ts, char c) {
 		ts[len] = c;
 		ts[len+1] = '\0';
 	}
-	// printf("%d, %s\n", len, ts);
-
+	int len2 = strlen(ts);
+	// printf("pre: %d, post: %d", len, len2);
+	// printf(", %s\n", ts);
 }
 
 void free_tstring(char* ts) {
@@ -184,15 +186,22 @@ void free_tstring(char* ts) {
 	ts[0] = '\0';
 }
 
-void set_depth_element(adv_json_depth* depth_trace) {
-	if(depth_trace->current_depth > depth_trace->allocated) {
-		depth_trace->depth_element = (int*)realloc(depth_trace->depth_element, (++depth_trace->allocated)*sizeof(int));
-
+void allocate_depth_element(adv_json_depth* depth_trace) {
+	if(depth_trace->current_depth >= depth_trace->allocated) {
+		depth_trace->allocated = depth_trace->current_depth + 1;
+		depth_trace->depth_element = (int*)realloc(depth_trace->depth_element, (depth_trace->allocated)*sizeof(int));
 	}
+}
+
+void set_depth_element(adv_json_depth* depth_trace) {
+	// printf("alloc: %d, d: %d", depth_trace->allocated, depth_trace->current_depth);
+	allocate_depth_element(depth_trace);
+	// printf("alloc: %d, d: %d", depth_trace->allocated, depth_trace->current_depth);
 	depth_trace->depth_element[depth_trace->current_depth] = 1;
 }
 
 void reset_depth_element(adv_json_depth* depth_trace){
+	allocate_depth_element(depth_trace);
 	depth_trace->depth_element[depth_trace->current_depth] = 0;
 }
 
@@ -216,8 +225,8 @@ bool validate_json(char* json_str){
 	ts[0] = '\0';
 
 	adv_char_stack* c_stack = init_adv_char_stack();
-	for(i=0;i<len;i++) {
 
+	for(i=0;i<len;i++) {
 		if (c_stack->size > 0)
 			c = seek_adv_char_stack(c_stack);
 		else
@@ -335,11 +344,11 @@ bool validate_json(char* json_str){
 			break;
 		}
 	}
+
 	if(c_stack->size > 0) {
 		invalid = true;
 		printf("\n Error at dangling syntax stack %d, char: %c", c_stack->size, seek_adv_char_stack(c_stack));
 	}
-
 	return (!invalid);
 }
 
@@ -358,11 +367,7 @@ adv_kv_or_a* parse_json(char* json_str){
 
 	// current level of depth which is root represent
 	// as 0 in json tree which have only one element
-	adv_json_depth *depth = malloc(sizeof(depth));
-	depth->current_depth = 0;
-	depth->allocated = 1;
-	depth->depth_element = (int*)malloc(sizeof(int));
-	depth->depth_element[0] = 1;
+	adv_json_depth *depth = init_adv_json_depth();
 
 	char* ts = (char*)malloc(sizeof(char));
 	ts[0] = '\0';

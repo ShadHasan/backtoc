@@ -34,7 +34,7 @@ int json_test() {
 	char* jsonstr7 = "[";
 	char* jsonstr8 = "[,]";
 	char* jsonstr9 = "]";
-	char* jsonstr10 = "{\"key\": \"value\", \"key2\": [], \"key3\": {\"key3\":{}}";
+	char* jsonstr10 = "{\"key\": \"value\", \"key2\": [], \"key3\": {\"key31\":{}}";
 	char* jsonstr11 = "{,}";
 
 	// List of valid json
@@ -55,6 +55,7 @@ int json_test() {
 	}
 	printf("\n");
 	*/
+
 	invalid_json(jsonstr1);
 	invalid_json(jsonstr2);
 	invalid_json(jsonstr3);
