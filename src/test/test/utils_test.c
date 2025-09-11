@@ -21,7 +21,7 @@ void invalid_json(char* str) {
 	}
 }
 
-int json_test() {
+int json_validation_test() {
 	char* jsonstr = "{\"key\": \"value\", \"key2\": [], \"key3\": {}}";
 
 	// List of invalid json
@@ -74,6 +74,16 @@ int json_test() {
 	valid_jaon(vjsonstr4);
 	valid_jaon(vjsonstr5);
 	valid_jaon(vjsonstr6);
+
+}
+
+int json_parsing_test() {
+
+}
+
+int json_test() {
+	// json_validation_test();
+	json_parsing_test();
 
 	return 0;
 }

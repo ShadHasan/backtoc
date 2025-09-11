@@ -31,9 +31,9 @@ struct kv_multi_type_stack {
 	char** temp_value;
 	char* single_char;
 
-	int* type_track;  // array 0, object 1, key 2, value 3, single char 4
+	int* type_track;     // array 0, object 1, key 2, value 3, single char 4
 	int type_allocated;  // keep track of type_track allocated memory.
-	int stack_size;     // keep track of current stack size
+	int stack_size;      // keep track of current stack size
 
 	int allocated_0;
 	int type_0_size;
@@ -386,15 +386,19 @@ adv_kv_or_a* parse_json(char* json_str){
 					push_adv_char_stack(c_stack, '{');
 					isKey = true;
 					// TODO: Here initialize kv object
+					depth->temp_obj = (adv_kv_obj*)malloc(sizeof(adv_kv_obj));
 					depth->current_depth++;
+					push_to_kv_multi_stack(depth, depth->temp_obj, NULL, NULL, NULL);
 				}
 				break;
 			case '[':
 				if (c != '"') {   // if " is not otos. Not string literal but json syntax
 					push_adv_char_stack(c_stack, '[');
+					depth->temp_arr = (adv_kv_array*)malloc(sizeof(adv_kv_array));
 					// TODO: here initialize new kv array
 					isKey = false;
 					depth->current_depth++;
+					push_to_kv_multi_stack(depth, NULL, depth->temp_arr, NULL, NULL);
 				}
 				break;
 			case '"':
