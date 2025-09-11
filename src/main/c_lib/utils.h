@@ -139,6 +139,26 @@ void pop_to_kv_multi_stack(adv_json_depth* depth_tracer, adv_kv_obj* obj, adv_kv
 	kmts->stack_size--;
 }
 
+int seek_to_kv_multi_stack(adv_json_depth* depth_tracer, adv_kv_obj* obj, adv_kv_array* arr, char* key, char* value) {
+	kv_multi_type_stack* kmts = depth_tracer->kmts;
+	int type = kmts->type_track[kmts->stack_size-1];
+	switch(type) {
+		case 0:
+			arr = kmts->arr[kmts->type_0_size];
+			break;
+		case 1:
+			obj = kmts->obj[kmts->type_1_size];
+			break;
+		case 2:
+			key = kmts->temp_key[kmts->type_2_size];
+			break;
+		case 3:
+			value = kmts->temp_value[kmts->type_3_size];
+			break;
+	}
+	return type;
+}
+
 
 adv_json_depth* init_adv_json_depth() {
 	adv_json_depth *depth = malloc(sizeof(adv_json_depth));
@@ -385,7 +405,7 @@ adv_kv_or_a* parse_json(char* json_str){
 				if (c != '"') {   // if " is not otos. Not string literal but json syntax
 					push_adv_char_stack(c_stack, '{');
 					isKey = true;
-					// TODO: Here initialize kv object
+					// Initialize kv object
 					depth->temp_obj = (adv_kv_obj*)malloc(sizeof(adv_kv_obj));
 					depth->current_depth++;
 					push_to_kv_multi_stack(depth, depth->temp_obj, NULL, NULL, NULL);
@@ -394,8 +414,8 @@ adv_kv_or_a* parse_json(char* json_str){
 			case '[':
 				if (c != '"') {   // if " is not otos. Not string literal but json syntax
 					push_adv_char_stack(c_stack, '[');
+					// Initialize new kv array
 					depth->temp_arr = (adv_kv_array*)malloc(sizeof(adv_kv_array));
-					// TODO: here initialize new kv array
 					isKey = false;
 					depth->current_depth++;
 					push_to_kv_multi_stack(depth, NULL, depth->temp_arr, NULL, NULL);
@@ -409,10 +429,17 @@ adv_kv_or_a* parse_json(char* json_str){
 					// here get the key in ts if isKey "true" else value
 					switch(c) {
 						case '{':
-							// key or value
+							// key or value since object
+							if (isKey) {
+								push_to_kv_multi_stack(depth, NULL, depth->temp_arr, ts, NULL);
+							} else {
+								push_to_kv_multi_stack(depth, NULL, depth->temp_arr, NULL, ts);
+							}
+
 							break;
 						case '[':
-							// value
+							// only value since array
+							push_to_kv_multi_stack(depth, NULL, depth->temp_arr, NULL, ts);
 							break;
 					}
 					set_depth_element(depth);

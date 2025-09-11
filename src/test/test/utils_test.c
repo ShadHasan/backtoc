@@ -83,7 +83,8 @@ int json_parsing_test() {
 
 int json_test() {
 	// json_validation_test();
-	json_parsing_test();
+	char* jsonstr = "{\"key\": \"value\"}";
+	json_parsing_test(jsonstr);
 
 	return 0;
 }
