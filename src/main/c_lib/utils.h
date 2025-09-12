@@ -468,31 +468,53 @@ adv_kv_or_a* parse_json(char* json_str){
 							case 0:
 								ta = depth->temp_arr;
 								type_key = pop_to_kv_multi_stack(depth);
-								if (type_key != 3) {
+								if (type_key != 2) {
 									invalid = true;
 								} else {
+									// now seek current object is on otos then just link it
 									seek_type = seek_type_kv_multi_stack(depth);
 									// if it is object then valid else invalid
 									if (seek_type == 1) {
-										adv_kv_add_obj_arr(depth->temp_obj, depth->depth_temp_key, depth->temp_arr);
+										adv_kv_add_obj_arr(depth->temp_obj, depth->depth_temp_key, ta);
 									} else {
 										invalid = true;
 									}
 								}
-								// now current object is on otos just link it above key - value
-
 								break;
 							case 1:
+								to = depth->temp_obj;
 								type_key = pop_to_kv_multi_stack(depth);
-								tk = depth->depth_temp_key;
-								// now current object is on otos just link it above key - value
-								seek_type = seek_type_kv_multi_stack(depth);
+								if (type_key != 2) {
+									invalid = true;
+								} else {
+									// now seek current object is on otos then just link it
+									seek_type = seek_type_kv_multi_stack(depth);
+									// if it is object then valid else invalid
+									if (seek_type == 1) {
+										adv_kv_add_obj_obj(depth->temp_obj, depth->depth_temp_key, to);
+									} else {
+										invalid = true;
+									}
+								}
 								break;
-							case 2:
+							case 3:
+								tv = depth->depth_temp_value;
 								type_key = pop_to_kv_multi_stack(depth);
-								tk = depth->depth_temp_key;
-								// now current object is on otos just link it above key - value
-								seek_type = seek_type_kv_multi_stack(depth);
+								if (type_key != 2) {
+									invalid = true;
+								} else {
+									// now seek current object is on otos then just link it
+									seek_type = seek_type_kv_multi_stack(depth);
+									// if it is object then valid else invalid
+									if (seek_type == 1) {
+										adv_kv_add_obj_str(depth->temp_obj, depth->depth_temp_key, tv);
+									} else {
+										invalid = true;
+									}
+								}
+								break;
+							case default:
+								invalid = true;
 								break;
 						}
 
