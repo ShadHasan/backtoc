@@ -119,41 +119,46 @@ void push_to_kv_multi_stack(adv_json_depth* depth_tracer, adv_kv_obj* obj, adv_k
 	kmts->stack_size++;
 }
 
-void pop_to_kv_multi_stack(adv_json_depth* depth_tracer, adv_kv_obj* obj, adv_kv_array* arr, char* key, char* value) {
+int pop_to_kv_multi_stack(adv_json_depth* depth_tracer, adv_kv_obj* obj, adv_kv_array* arr, char* key, char* value) {
 	kv_multi_type_stack* kmts = depth_tracer->kmts;
 	int type = kmts->type_track[kmts->stack_size-1];
 	switch(type) {
 		case 0:
-			arr = kmts->arr[kmts->type_0_size];
+			depth_tracer->temp_arr = kmts->arr[kmts->type_0_size];
+			kmts->type_0_size--;
 			break;
 		case 1:
-			obj = kmts->obj[kmts->type_1_size];
+			depth_tracer->temp_obj = kmts->obj[kmts->type_1_size];
+			kmts->type_1_size--;
 			break;
 		case 2:
-			key = kmts->temp_key[kmts->type_2_size];
+			depth_tracer->depth_temp_key = kmts->temp_key[kmts->type_2_size];
+			kmts->type_2_size--;
 			break;
 		case 3:
-			value = kmts->temp_value[kmts->type_3_size];
+			depth_tracer->depth_temp_value = kmts->temp_value[kmts->type_3_size];
+			kmts->type_3_size--;
 			break;
 	}
 	kmts->stack_size--;
+	return type;
 }
 
-int seek_to_kv_multi_stack(adv_json_depth* depth_tracer, adv_kv_obj* obj, adv_kv_array* arr, char* key, char* value) {
+int seek_type_kv_multi_stack(adv_json_depth* depth_tracer) {
 	kv_multi_type_stack* kmts = depth_tracer->kmts;
 	int type = kmts->type_track[kmts->stack_size-1];
 	switch(type) {
 		case 0:
-			arr = kmts->arr[kmts->type_0_size];
+			depth_tracer->temp_arr = kmts->arr[kmts->type_0_size];
 			break;
 		case 1:
-			obj = kmts->obj[kmts->type_1_size];
+			depth_tracer->temp_obj = kmts->obj[kmts->type_1_size];
 			break;
 		case 2:
-			key = kmts->temp_key[kmts->type_2_size];
+			depth_tracer->depth_temp_key = kmts->temp_key[kmts->type_2_size];
 			break;
 		case 3:
-			value = kmts->temp_value[kmts->type_3_size];
+			depth_tracer->depth_temp_value = kmts->temp_value[kmts->type_3_size];
 			break;
 	}
 	return type;
@@ -426,10 +431,9 @@ adv_kv_or_a* parse_json(char* json_str){
 					push_adv_char_stack(c_stack, '"');
 				} else {
 					poped_c = pop_adv_char_stack(c_stack);
-					// here get the key in ts if isKey "true" else value
 					switch(c) {
 						case '{':
-							// key or value since object
+							// here get the key in ts if isKey "true" else value
 							if (isKey) {
 								push_to_kv_multi_stack(depth, NULL, depth->temp_arr, ts, NULL);
 							} else {
@@ -442,6 +446,7 @@ adv_kv_or_a* parse_json(char* json_str){
 							push_to_kv_multi_stack(depth, NULL, depth->temp_arr, NULL, ts);
 							break;
 					}
+					free_tstring(ts);
 					set_depth_element(depth);
 				}
 				break;
@@ -477,8 +482,6 @@ adv_kv_or_a* parse_json(char* json_str){
 				} else {
 					if (c != '"') {  // if " is not on top of stack. It is not string literal but json syntax and it is key but value.
 						isKey = false;
-						// TODO: here push string kv object keys
-						free_tstring(ts);
 					} else {
 						if (c == '[') {   // if c is [(array) it does not expect semicolon
 							invalid = true;
@@ -495,11 +498,8 @@ adv_kv_or_a* parse_json(char* json_str){
 						reset_depth_element(depth);
 						switch(c) {
 						case '{':
-							if (isKey){
-								// TODO: store ts as temp_key for current kv object and pushed to kv object when value is determined.
-							} else {
-								// TODO: push ts as values with keys in temp_key as a key to current kv object
-							}
+							// pop value and key and link with current object
+							seek_type_kv_multi_stack();
 							isKey = true;
 							break;
 						case '[':
