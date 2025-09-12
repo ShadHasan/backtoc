@@ -394,6 +394,7 @@ adv_kv_or_a* parse_json(char* json_str){
 
 	char* ts = (char*)malloc(sizeof(char));
 	ts[0] = '\0';
+	adv_kv_obj* to;
 
 
 	adv_int_stack* i_stack = init_adv_int_stack();
@@ -439,7 +440,37 @@ adv_kv_or_a* parse_json(char* json_str){
 			case '}':
 				if (c != 3) {   // if " is not otos. Not string literal but json syntax
 					popped_c = pop_adv_int_stack(i_stack);
+					to = adv_kv_init_obj();
 					while (popped_c != 1) {
+						switch(popped_c) {
+							case 5:
+								popped_c = pop_adv_int_stack(i_stack);
+								if (popped_c == 2) {
+
+								} else {
+									invalid = true;
+								}
+								break;
+							case 6:
+								popped_c = pop_adv_int_stack(i_stack);
+								if (popped_c == 2) {
+
+								} else {
+									invalid = true;
+								}
+								break;
+							case 7:
+								popped_c = pop_adv_int_stack(i_stack);
+								if (popped_c == 2) {
+
+								} else {
+									invalid = true;
+								}
+								break;
+							default:
+								invalid = true;
+								break;
+						}
 
 					}
 				}
