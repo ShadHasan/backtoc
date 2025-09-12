@@ -386,152 +386,71 @@ adv_kv_or_a* parse_json(char* json_str){
 
 	int len = strlen(json_str);
 
-	char c, poped_c;
+	int c, popped_c; // array[] 0, object{} 1, key 2, quote" 3, value_array 5, value_object 6, value_string 7
 	bool isKey = true;
-	int type;  // array 0, object 1, string 2
-	int type_key;
-	int seek_type;
-
 	// current level of depth which is root represent
 	// as 0 in json tree which have only one element
 	adv_json_depth *depth = init_adv_json_depth();
 
 	char* ts = (char*)malloc(sizeof(char));
 	ts[0] = '\0';
-	adv_kv_obj* to;
-	adv_kv_array* ta;
-	char* tk;
-	char* tv;
 
-	adv_char_stack* c_stack = init_adv_char_stack();
+
+	adv_int_stack* i_stack = init_adv_int_stack();
 	for(i=0;i<len;i++) {
 
-		if (c_stack->size > 0)
-			c = seek_adv_char_stack(c_stack);
+		if (i_stack->size > 0)
+			c = seek_adv_int_stack(i_stack);
 		else
-			c = '*';
+			c = -1;
 
 		switch(json_str[i]) {
 			case '{':
-				if (c != '"') {   // if " is not otos. Not string literal but json syntax
-					push_adv_char_stack(c_stack, '{');
+				if (c != 3) {   // if " is not otos. Not string literal but json syntax
+					push_adv_int_stack(i_stack, 1);
 					isKey = true;
-					// Initialize kv object
-					depth->temp_obj = adv_kv_init_obj();
-					depth->current_depth++;
-					push_to_kv_multi_stack(depth, depth->temp_obj, NULL, NULL, NULL);
 				}
 				break;
 			case '[':
-				if (c != '"') {   // if " is not otos. Not string literal but json syntax
-					push_adv_char_stack(c_stack, '[');
+				if (c != 3) {   // if " is not otos. Not string literal but json syntax
+					push_adv_int_stack(i_stack, 0);
 					// Initialize new kv array
 					depth->temp_arr = adv_kv_init_arr();
 					isKey = false;
-					depth->current_depth++;
-					push_to_kv_multi_stack(depth, NULL, depth->temp_arr, NULL, NULL);
 				}
 				break;
 			case '"':
-				if (c != '"') {   // if " is not otos. Not string literal but json syntax
-					push_adv_char_stack(c_stack, '"');
+				if (c != 3) {   // if " is not otos. Not string literal but json syntax
+					push_adv_int_stack(i_stack, 3);
 				} else {
-					poped_c = pop_adv_char_stack(c_stack);
-					switch(c) {
-						case '{':
-							// here get the key in ts if isKey "true" else value
-							if (isKey) {
-								push_to_kv_multi_stack(depth, NULL, NULL, ts, NULL);
-							} else {
-								push_to_kv_multi_stack(depth, NULL, NULL, NULL, ts);
-							}
-
-							break;
-						case '[':
-							// only value since array
+					popped_c = pop_adv_int_stack(i_stack);
+					if (popped_c != 3) {
+						invalid = true;
+					} else {
+						if (isKey) {
+							push_to_kv_multi_stack(depth, NULL, NULL, ts, NULL);
+						} else {
 							push_to_kv_multi_stack(depth, NULL, NULL, NULL, ts);
-							break;
+						}
 					}
 					free_tstring(ts);
-					set_depth_element(depth);
 				}
 				break;
 			case '}':
-				if (c != '"') {   // if " is not otos. Not string literal but json syntax
-					if (c != '{') {
-						invalid = true;
-					} else {
-						poped_c = pop_adv_char_stack(c_stack);
-						// pop twice from (val,obj, arr) and its key
-						type = pop_to_kv_multi_stack(depth);
-						switch (type) {
-							case 0:
-								ta = depth->temp_arr;
-								type_key = pop_to_kv_multi_stack(depth);
-								if (type_key != 2) {
-									invalid = true;
-								} else {
-									// now seek current object is on otos then just link it
-									seek_type = seek_type_kv_multi_stack(depth);
-									// if it is object then valid else invalid
-									if (seek_type == 1) {
-										adv_kv_add_obj_arr(depth->temp_obj, depth->depth_temp_key, ta);
-									} else {
-										invalid = true;
-									}
-								}
-								break;
-							case 1:
-								to = depth->temp_obj;
-								type_key = pop_to_kv_multi_stack(depth);
-								if (type_key != 2) {
-									invalid = true;
-								} else {
-									// now seek current object is on otos then just link it
-									seek_type = seek_type_kv_multi_stack(depth);
-									// if it is object then valid else invalid
-									if (seek_type == 1) {
-										adv_kv_add_obj_obj(depth->temp_obj, depth->depth_temp_key, to);
-									} else {
-										invalid = true;
-									}
-								}
-								break;
-							case 3:
-								tv = depth->depth_temp_value;
-								type_key = pop_to_kv_multi_stack(depth);
-								if (type_key != 2) {
-									invalid = true;
-								} else {
-									// now seek current object is on otos then just link it
-									seek_type = seek_type_kv_multi_stack(depth);
-									// if it is object then valid else invalid
-									if (seek_type == 1) {
-										adv_kv_add_obj_str(depth->temp_obj, depth->depth_temp_key, tv);
-									} else {
-										invalid = true;
-									}
-								}
-								break;
-							case default:
-								invalid = true;
-								break;
-						}
+				if (c != 3) {   // if " is not otos. Not string literal but json syntax
+					popped_c = pop_adv_int_stack(i_stack);
+					while (popped_c != 1) {
 
-
-						free_tstring(ts);
-						reset_depth_element(depth);
-						depth->current_depth--;
 					}
 				}
 				break;
 			case ']':
-				if (c != '"') {   // if " is not otos. Not string literal but json syntax
+				if (c != 3) {   // if " is not otos. Not string literal but json syntax
 					if (c != '[') {
 						invalid = true;
 					} else {
-						poped_c = pop_adv_char_stack(c_stack);
-						// Todo: here link kv array to predecessor
+						pop_adv_char_stack(c_stack);
+						// pop once from (val,obj, arr) then seek to link predecessor(current array)
 						free_tstring(ts);
 						reset_depth_element(depth);
 						depth->current_depth--;
@@ -542,7 +461,7 @@ adv_kv_or_a* parse_json(char* json_str){
 				if(!isKey) {
 					invalid = true; // value do not have followed value, only key have value.
 				} else {
-					if (c != '"') {  // if " is not on top of stack. It is not string literal but json syntax and it is key but value.
+					if (c != 3) {  // if " is not on top of stack. It is not string literal but json syntax and it is key but value.
 						isKey = false;
 					} else {
 						if (c == '[') {   // if c is [(array) it does not expect semicolon
@@ -552,7 +471,7 @@ adv_kv_or_a* parse_json(char* json_str){
 				}
 				break;
 			case ',':
-				if (c != '"') {  // if " is not otos. Not string literal but json syntax and it is either next key-value or value of an array
+				if (c != 3) {  // if " is not otos. Not string literal but json syntax and it is either next key-value or value of an array
 					// TODO: invalid if current kv object or array does not have any value or key-value
 					if (depth->depth_element[depth->current_depth] == 0) {
 						invalid = true;
@@ -574,7 +493,7 @@ adv_kv_or_a* parse_json(char* json_str){
 				}
 				break;
 			default:
-				if (c == '"') {
+				if (c == 3) {
 					tstring(ts, json_str[i]);
 				}
 				break;

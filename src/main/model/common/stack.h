@@ -4,9 +4,15 @@
 
 
 typedef struct adv_char_stack adv_char_stack;
+typedef struct adv_int_stack adv_int_stack;
 
 struct adv_char_stack {
 	char* c;
+	int size;
+};
+
+struct adv_int_stack {
+	int* i;
 	int size;
 };
 
@@ -36,6 +42,34 @@ char pop_adv_char_stack(adv_char_stack* stack) {
 	stack->c = (char*)realloc(stack->c, (stack->size-1)*sizeof(char));
 	stack->size--;
 	return c;
+}
+
+adv_int_stack* init_adv_int_stack() {
+	adv_int_stack* stack = malloc(sizeof(adv_int_stack));
+	stack->i = NULL;
+	stack->size = 0;
+	return stack;
+}
+
+void push_adv_int_stack(adv_int_stack* stack, int i) {
+	if (stack->i == NULL) {
+		stack->i = (int*)malloc(sizeof(int));
+		stack->size = 0;
+	} else {
+		stack->i = (int*)realloc(stack->i, (stack->size+1)*sizeof(int));
+	}
+	stack->i[stack->size++] = i;
+}
+
+char seek_adv_int_stack(adv_int_stack* stack) {
+	return stack->i[stack->size-1];
+}
+
+int pop_adv_int_stack(adv_int_stack* stack) {
+	int i = stack->i[(stack->size-1)];
+	stack->i = (int*)realloc(stack->i, (stack->size-1)*sizeof(int));
+	stack->size--;
+	return i;
 }
 
 #endif
