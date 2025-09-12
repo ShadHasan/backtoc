@@ -396,6 +396,8 @@ adv_kv_or_a* parse_json(char* json_str){
 
 	char* ts = (char*)malloc(sizeof(char));
 	ts[0] = '\0';
+	adv_kv_obj* to;
+	adv_kv_array* ta;
 
 	adv_char_stack* c_stack = init_adv_char_stack();
 	for(i=0;i<len;i++) {
@@ -411,7 +413,7 @@ adv_kv_or_a* parse_json(char* json_str){
 					push_adv_char_stack(c_stack, '{');
 					isKey = true;
 					// Initialize kv object
-					depth->temp_obj = (adv_kv_obj*)malloc(sizeof(adv_kv_obj));
+					depth->temp_obj = adv_kv_init_obj();
 					depth->current_depth++;
 					push_to_kv_multi_stack(depth, depth->temp_obj, NULL, NULL, NULL);
 				}
@@ -420,7 +422,7 @@ adv_kv_or_a* parse_json(char* json_str){
 				if (c != '"') {   // if " is not otos. Not string literal but json syntax
 					push_adv_char_stack(c_stack, '[');
 					// Initialize new kv array
-					depth->temp_arr = (adv_kv_array*)malloc(sizeof(adv_kv_array));
+					depth->temp_arr = adv_kv_init_arr();
 					isKey = false;
 					depth->current_depth++;
 					push_to_kv_multi_stack(depth, NULL, depth->temp_arr, NULL, NULL);
