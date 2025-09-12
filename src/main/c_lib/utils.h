@@ -119,7 +119,7 @@ void push_to_kv_multi_stack(adv_json_depth* depth_tracer, adv_kv_obj* obj, adv_k
 	kmts->stack_size++;
 }
 
-int pop_to_kv_multi_stack(adv_json_depth* depth_tracer, adv_kv_obj* obj, adv_kv_array* arr, char* key, char* value) {
+int pop_to_kv_multi_stack(adv_json_depth* depth_tracer) {
 	kv_multi_type_stack* kmts = depth_tracer->kmts;
 	int type = kmts->type_track[kmts->stack_size-1];
 	switch(type) {
@@ -388,7 +388,9 @@ adv_kv_or_a* parse_json(char* json_str){
 
 	char c, poped_c;
 	bool isKey = true;
-	short type;  // array 0, object 1, string 2
+	int type;  // array 0, object 1, string 2
+	int type_key;
+	int seek_type;
 
 	// current level of depth which is root represent
 	// as 0 in json tree which have only one element
@@ -398,6 +400,8 @@ adv_kv_or_a* parse_json(char* json_str){
 	ts[0] = '\0';
 	adv_kv_obj* to;
 	adv_kv_array* ta;
+	char* tk;
+	char* tv;
 
 	adv_char_stack* c_stack = init_adv_char_stack();
 	for(i=0;i<len;i++) {
@@ -437,15 +441,15 @@ adv_kv_or_a* parse_json(char* json_str){
 						case '{':
 							// here get the key in ts if isKey "true" else value
 							if (isKey) {
-								push_to_kv_multi_stack(depth, NULL, depth->temp_arr, ts, NULL);
+								push_to_kv_multi_stack(depth, NULL, NULL, ts, NULL);
 							} else {
-								push_to_kv_multi_stack(depth, NULL, depth->temp_arr, NULL, ts);
+								push_to_kv_multi_stack(depth, NULL, NULL, NULL, ts);
 							}
 
 							break;
 						case '[':
 							// only value since array
-							push_to_kv_multi_stack(depth, NULL, depth->temp_arr, NULL, ts);
+							push_to_kv_multi_stack(depth, NULL, NULL, NULL, ts);
 							break;
 					}
 					free_tstring(ts);
@@ -458,7 +462,41 @@ adv_kv_or_a* parse_json(char* json_str){
 						invalid = true;
 					} else {
 						poped_c = pop_adv_char_stack(c_stack);
-						// Todo: here link kv object to predecessor
+						// pop twice from (val,obj, arr) and its key
+						type = pop_to_kv_multi_stack(depth);
+						switch (type) {
+							case 0:
+								ta = depth->temp_arr;
+								type_key = pop_to_kv_multi_stack(depth);
+								if (type_key != 3) {
+									invalid = true;
+								} else {
+									seek_type = seek_type_kv_multi_stack(depth);
+									// if it is object then valid else invalid
+									if (seek_type == 1) {
+										adv_kv_add_obj_arr(depth->temp_obj, depth->depth_temp_key, depth->temp_arr);
+									} else {
+										invalid = true;
+									}
+								}
+								// now current object is on otos just link it above key - value
+
+								break;
+							case 1:
+								type_key = pop_to_kv_multi_stack(depth);
+								tk = depth->depth_temp_key;
+								// now current object is on otos just link it above key - value
+								seek_type = seek_type_kv_multi_stack(depth);
+								break;
+							case 2:
+								type_key = pop_to_kv_multi_stack(depth);
+								tk = depth->depth_temp_key;
+								// now current object is on otos just link it above key - value
+								seek_type = seek_type_kv_multi_stack(depth);
+								break;
+						}
+
+
 						free_tstring(ts);
 						reset_depth_element(depth);
 						depth->current_depth--;
