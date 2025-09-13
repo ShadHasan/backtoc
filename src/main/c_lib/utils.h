@@ -490,7 +490,8 @@ adv_kv_or_a* parse_json(char* json_str){
 						}
 						popped_c = pop_adv_int_stack(i_stack);
 					}
-
+					push_adv_int_stack(i_stack, 6);
+					push_to_kv_multi_stack(depth, sto, NULL, NULL, NULL);
 				}
 				break;
 			case ']':
