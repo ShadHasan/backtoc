@@ -78,10 +78,21 @@ int json_validation_test() {
 }
 
 int multi_stack_test() {
+	adv_json_depth *depth = init_adv_json_depth();
+	int type;
+
+	push_to_kv_multi_stack(depth, NULL, NULL, "hello", NULL);
+	push_to_kv_multi_stack(depth, NULL, NULL, NULL, "world");
+
+	type = pop_to_kv_multi_stack(depth);
+	printf("%d, %s", type, depth->depth_temp_value);
+	type = pop_to_kv_multi_stack(depth);
+	printf("%d, %s", type, depth->depth_temp_key);
 	return 0;
 }
 
-int json_parsing_test(char* jsonstr) {
+int json_parsing_test() {
+	char* jsonstr = "{\"key\": \"value\"}";
 	adv_kv_or_a* collective = (adv_kv_or_a*)malloc(sizeof(adv_kv_or_a));
 	collective->type = -1;
 	parse_json(collective, jsonstr);
@@ -101,8 +112,9 @@ int json_parsing_test(char* jsonstr) {
 
 int json_test() {
 	// json_validation_test();
-	char* jsonstr = "{\"key\": \"value\"}";
-	json_parsing_test(jsonstr);
+
+	// multi_stack_test();
+	json_parsing_test();
 
 	return 0;
 }

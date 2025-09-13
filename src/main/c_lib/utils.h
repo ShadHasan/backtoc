@@ -27,8 +27,8 @@ struct adv_json_depth {
 struct kv_multi_type_stack {
 	adv_kv_obj** obj;
 	adv_kv_array** arr;
-	char** temp_key;
-	char** temp_value;
+	char** key;
+	char** value;
 	char* single_char;
 
 	int* type_track;     // array 0, object 1, key 2, value 3, single char 4
@@ -50,6 +50,7 @@ struct kv_multi_type_stack {
 
 void push_to_kv_multi_stack(adv_json_depth* depth_tracer, adv_kv_obj* obj, adv_kv_array* arr, char* key, char* value) {
 	kv_multi_type_stack* kmts = depth_tracer->kmts;
+	int type;
 	if (kmts->type_allocated <= (kmts->stack_size+1)) {
 		if (kmts->stack_size == 0) {
 			kmts->type_track = (int*)malloc(sizeof(int));
@@ -60,63 +61,72 @@ void push_to_kv_multi_stack(adv_json_depth* depth_tracer, adv_kv_obj* obj, adv_k
 		}
 	}
 	if (obj != NULL) {
-		kmts->type_track[kmts->stack_size] = 1;
-		if (kmts->allocated_1 < (kmts->type_1_size + 1)) {
-			if (kmts->type_1_size == 0) {
-				kmts->obj = (adv_kv_obj**)malloc(sizeof(adv_kv_obj*));
-			} else {
-				kmts->obj = (adv_kv_obj**)realloc(kmts->obj, (kmts->type_1_size + 1)*sizeof(adv_kv_obj*));
-			}
-			kmts->allocated_1 = kmts->type_1_size + 1;
-		}
-		kmts->obj[kmts->type_1_size] = obj;
-		kmts->type_1_size++;
+		type = 1;
 	} else {
-		if ( arr != NULL) {
-			kmts->type_track[kmts->stack_size] = 0;
-			if (kmts->allocated_0 < (kmts->type_0_size + 1)) {
+		if ( arr != NULL ) {
+			type = 0;
+		} else {
+			if (key != NULL) {
+				type = 2;
+			} else {
+				if(value != NULL) {
+					type = 3;
+				} else {
+					type = -1;
+					return;
+				}
+			}
+		}
+	}
+	kmts->type_track[kmts->stack_size] = type;
+	switch(type) {
+		case 0:
+			if (kmts->allocated_0 <= kmts->type_0_size) {
 				if (kmts->type_0_size == 0) {
 					kmts->arr = (adv_kv_array**)malloc(sizeof(adv_kv_array*));
 				} else {
 					kmts->arr = (adv_kv_array**)realloc(kmts->arr, (kmts->type_0_size + 1)*sizeof(adv_kv_array*));
 				}
-				kmts->allocated_0 = kmts->type_0_size + 1;
+				kmts->allocated_0 = ++kmts->type_0_size;
 			}
-			kmts->arr[kmts->type_0_size] = arr;
-			kmts->type_0_size++;
-		} else {
-			if (key != NULL) {
-				kmts->type_track[kmts->stack_size] = 2;
-				if (kmts->allocated_2 < (kmts->type_2_size + 1)) {
-					if (kmts->type_2_size == 0) {
-						kmts->temp_key = (char**)malloc(sizeof(char*));
-					} else {
-						kmts->temp_key = (char**)realloc(kmts->temp_key, (kmts->type_2_size + 1)*sizeof(char*));
-					}
-					kmts->allocated_2 = kmts->type_2_size + 1;
-				}
-				kmts->temp_key[kmts->type_2_size] = key;
-				kmts->type_2_size++;
-			} else {
-				if (value != NULL) {
-					kmts->type_track[kmts->stack_size] = 3;
-					if (kmts->allocated_3 < (kmts->type_3_size + 1)) {
-						if (kmts->type_3_size == 0) {
-							kmts->temp_value = (char**)malloc(sizeof(char*));
-						} else {
-							kmts->temp_value = (char**)realloc(kmts->temp_value, (kmts->type_3_size + 1)*sizeof(char*));
-						}
-						kmts->allocated_3 = kmts->type_3_size + 1;
-					}
-					kmts->temp_value[kmts->type_3_size] = value;
-					kmts->type_3_size++;
+			kmts->arr[kmts->type_0_size-1] = obj;
+			break;
+		case 1:
+			if (kmts->allocated_1 <= kmts->type_1_size) {
+				if (kmts->type_1_size == 0) {
+					kmts->obj = (adv_kv_obj**)malloc(sizeof(adv_kv_obj*));
 				} else {
-					// No action here
+					kmts->obj = (adv_kv_obj**)realloc(kmts->obj, (kmts->type_1_size + 1)*sizeof(adv_kv_obj*));
 				}
+				kmts->allocated_1 = ++kmts->type_1_size;
 			}
-		}
+			kmts->obj[kmts->type_1_size-1] = obj;
+			break;
+		case 2:
+			if (kmts->allocated_2 <= kmts->type_2_size) {
+				if (kmts->type_2_size == 0) {
+					kmts->key = (char**)malloc(sizeof(char*));
+				} else {
+					kmts->key = (char**)realloc(kmts->key, (kmts->type_2_size + 1)*sizeof(char*));
+				}
+				kmts->allocated_2 = ++kmts->type_2_size;
+			}
+			kmts->key[kmts->type_2_size-1] = key;
+			break;
+		case 3:
+			if (kmts->allocated_3 <= kmts->type_3_size) {
+				if (kmts->type_3_size == 0) {
+					kmts->value = (char**)malloc(sizeof(char*));
+				} else {
+					kmts->value = (char**)realloc(kmts->value, (kmts->type_3_size + 1)*sizeof(char*));
+				}
+				kmts->allocated_3 = ++kmts->type_3_size;
+			}
+			kmts->value[kmts->type_3_size-1] = value;
+			break;
 	}
 	kmts->stack_size++;
+
 }
 
 int pop_to_kv_multi_stack(adv_json_depth* depth_tracer) {
@@ -124,19 +134,19 @@ int pop_to_kv_multi_stack(adv_json_depth* depth_tracer) {
 	int type = kmts->type_track[kmts->stack_size-1];
 	switch(type) {
 		case 0:
-			depth_tracer->temp_arr = kmts->arr[kmts->type_0_size];
+			depth_tracer->temp_arr = kmts->arr[kmts->type_0_size-1];
 			kmts->type_0_size--;
 			break;
 		case 1:
-			depth_tracer->temp_obj = kmts->obj[kmts->type_1_size];
+			depth_tracer->temp_obj = kmts->obj[kmts->type_1_size-1];
 			kmts->type_1_size--;
 			break;
 		case 2:
-			depth_tracer->depth_temp_key = kmts->temp_key[kmts->type_2_size];
+			depth_tracer->depth_temp_key = kmts->key[kmts->type_2_size-1];
 			kmts->type_2_size--;
 			break;
 		case 3:
-			depth_tracer->depth_temp_value = kmts->temp_value[kmts->type_3_size];
+			depth_tracer->depth_temp_value = kmts->value[kmts->type_3_size-1];
 			kmts->type_3_size--;
 			break;
 	}
@@ -155,10 +165,10 @@ int seek_type_kv_multi_stack(adv_json_depth* depth_tracer) {
 			depth_tracer->temp_obj = kmts->obj[kmts->type_1_size];
 			break;
 		case 2:
-			depth_tracer->depth_temp_key = kmts->temp_key[kmts->type_2_size];
+			depth_tracer->depth_temp_key = kmts->key[kmts->type_2_size];
 			break;
 		case 3:
-			depth_tracer->depth_temp_value = kmts->temp_value[kmts->type_3_size];
+			depth_tracer->depth_temp_value = kmts->value[kmts->type_3_size];
 			break;
 	}
 	return type;
