@@ -443,7 +443,7 @@ adv_kv_or_a* parse_json(char* json_str){
 				}
 				break;
 			case '}':
-				if (c != 3) {   // if " is not otos. Not string literal but json syntax
+				if (c != 3) {
 					sto = adv_kv_init_obj();
 					popped_c = pop_adv_int_stack(i_stack);
 					while (popped_c != 1) {
@@ -477,7 +477,7 @@ adv_kv_or_a* parse_json(char* json_str){
 								tv = depth->depth_temp_value;
 								popped_c = pop_adv_int_stack(i_stack);
 								type_key = pop_to_kv_multi_stack(depth);
-								if (popped_c == 2 && type == 1 && type_key == 2) {
+								if (popped_c == 2 && type == 3 && type_key == 2) {
 									tk = depth->depth_temp_key;
 									adv_kv_add_obj_str(sto, tk, tv);
 								} else {
@@ -488,22 +488,54 @@ adv_kv_or_a* parse_json(char* json_str){
 								invalid = true;
 								break;
 						}
+						if (invalid)
+							break;
 						popped_c = pop_adv_int_stack(i_stack);
 					}
-					push_adv_int_stack(i_stack, 6);
-					push_to_kv_multi_stack(depth, sto, NULL, NULL, NULL);
+					if (!invalid) {
+						push_adv_int_stack(i_stack, 6);
+						push_to_kv_multi_stack(depth, sto, NULL, NULL, NULL);
+					}
 				}
 				break;
 			case ']':
-				if (c != 3) {   // if " is not otos. Not string literal but json syntax
-					if (c != '[') {
-						invalid = true;
-					} else {
-						pop_adv_char_stack(c_stack);
-						// pop once from (val,obj, arr) then seek to link predecessor(current array)
-						free_tstring(ts);
-						reset_depth_element(depth);
-						depth->current_depth--;
+				if (c != 3) {
+					sta = adv_kv_init_arr();
+					popped_c = pop_adv_int_stack(i_stack);
+					while(popped_c != 0) {
+						switch(popped_c) {
+							case 5:
+								type = pop_to_kv_multi_stack(depth);
+								ta = depth->temp_arr;
+								if (type == 0)
+									adv_kv_add_arr_str(sta, ta);
+								else
+									invalid = true;
+								break;
+							case 6:
+								type = pop_to_kv_multi_stack(depth);
+								to = depth->temp_obj;
+								if (type == 1)
+									adv_kv_add_arr_str(sta, to);
+								else
+									invalid = true;
+								break;
+							case 7:
+								type = pop_to_kv_multi_stack(depth);
+								tv = depth->depth_temp_value;
+								if (type == 3)
+									adv_kv_add_arr_str(sta, tv);
+								else
+									invalid = true;
+								break;
+						}
+						if (invalid)
+							break;
+						popped_c = pop_adv_int_stack(i_stack);
+					}
+					if (!invalid) {
+						push_adv_int_stack(i_stack, 5);
+						push_to_kv_multi_stack(depth, NULL, sta, NULL, NULL);
 					}
 				}
 				break;
