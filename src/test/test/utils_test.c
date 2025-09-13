@@ -88,6 +88,7 @@ int multi_stack_test() {
 	printf("%d, %s", type, depth->depth_temp_value);
 	type = pop_to_kv_multi_stack(depth);
 	printf("%d, %s", type, depth->depth_temp_key);
+	printf("\n");
 	return 0;
 }
 
@@ -113,7 +114,7 @@ int json_parsing_test() {
 int json_test() {
 	// json_validation_test();
 
-	// multi_stack_test();
+	multi_stack_test();
 	json_parsing_test();
 
 	return 0;

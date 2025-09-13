@@ -72,7 +72,7 @@ int pop_adv_int_stack(adv_int_stack* stack) {
 	return i;
 }
 
-char seek_adv_int_stack_first_arrival(adv_int_stack* stack, int* arr, int size_arr) {
+int seek_adv_int_stack_first_arrival(adv_int_stack* stack, int* arr, int size_arr) {
 	int i, j;
 	for(i = stack->size-1; i >= 0; i--) {
 		for(j=0; j<size_arr; j++) {

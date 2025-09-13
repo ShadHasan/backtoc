@@ -57,7 +57,7 @@ void push_to_kv_multi_stack(adv_json_depth* depth_tracer, adv_kv_obj* obj, adv_k
 			kmts->type_allocated = 1;
 		} else {
 			kmts->type_track = (int*)realloc(kmts->type_track, (kmts->stack_size+1)*sizeof(int));
-			kmts->type_allocated = kmts->stack_size+1;
+			kmts->type_allocated = kmts->stack_size + 1;
 		}
 	}
 	if (obj != NULL) {
@@ -89,7 +89,7 @@ void push_to_kv_multi_stack(adv_json_depth* depth_tracer, adv_kv_obj* obj, adv_k
 				}
 				kmts->allocated_0 = ++kmts->type_0_size;
 			}
-			kmts->arr[kmts->type_0_size-1] = obj;
+			kmts->arr[kmts->type_0_size-1] = arr;
 			break;
 		case 1:
 			if (kmts->allocated_1 <= kmts->type_1_size) {
@@ -159,21 +159,48 @@ int seek_type_kv_multi_stack(adv_json_depth* depth_tracer) {
 	int type = kmts->type_track[kmts->stack_size-1];
 	switch(type) {
 		case 0:
-			depth_tracer->temp_arr = kmts->arr[kmts->type_0_size];
+			depth_tracer->temp_arr = kmts->arr[kmts->type_0_size-1];
 			break;
 		case 1:
-			depth_tracer->temp_obj = kmts->obj[kmts->type_1_size];
+			depth_tracer->temp_obj = kmts->obj[kmts->type_1_size-1];
 			break;
 		case 2:
-			depth_tracer->depth_temp_key = kmts->key[kmts->type_2_size];
+			depth_tracer->depth_temp_key = kmts->key[kmts->type_2_size-1];
 			break;
 		case 3:
-			depth_tracer->depth_temp_value = kmts->value[kmts->type_3_size];
+			depth_tracer->depth_temp_value = kmts->value[kmts->type_3_size-1];
 			break;
 	}
 	return type;
 }
 
+void traverse_kv_multi_stack(adv_json_depth* depth_tracer) {
+	kv_multi_type_stack* kmts = depth_tracer->kmts;
+	int type;
+	int i, count_0, count_1, count_2, count_3 = 0;
+	count_0 = count_1 = count_2 = count_3;
+	for (i = 0; i<kmts->stack_size; i++) {
+		type = kmts->type_track[i];
+		switch(type) {
+			case 0:
+				// kmts->arr[count_0];
+				count_0++;
+				break;
+			case 1:
+				// kmts->obj[count_1];
+				count_1++;
+				break;
+			case 2:
+				printf("-k>%s ", kmts->key[count_2]);
+				count_2++;
+				break;
+			case 3:
+				printf("-v>%s ", kmts->value[count_3]);
+				count_3++;
+				break;
+		}
+	}
+}
 
 adv_json_depth* init_adv_json_depth() {
 	adv_json_depth *depth = malloc(sizeof(adv_json_depth));
@@ -183,18 +210,25 @@ adv_json_depth* init_adv_json_depth() {
 	depth->depth_element[0] = 1;
 	depth->kmts = (kv_multi_type_stack*)malloc(sizeof(kv_multi_type_stack));
 	depth->kmts->stack_size = 0;
+	depth->kmts->type_allocated = 0;
+
 	depth->kmts->type_0_size = 0;
 	depth->kmts->type_1_size = 0;
 	depth->kmts->type_2_size = 0;
 	depth->kmts->type_3_size = 0;
 	depth->kmts->type_4_size = 0;
-	depth->kmts->type_allocated = 0;
 	depth->kmts->allocated_0 = 0;
 	depth->kmts->allocated_1 = 0;
 	depth->kmts->allocated_2 = 0;
 	depth->kmts->allocated_3 = 0;
 	depth->kmts->allocated_4 = 0;
 	return depth;
+}
+
+char* init_string() {
+	char* ts = (char*)malloc(sizeof(char));
+	ts[0] = '\0';
+	return ts;
 }
 
 void tstring(char* ts, char c) {
@@ -400,8 +434,7 @@ void parse_json(adv_kv_or_a* collective, char* json_str){
 	// as 0 in json tree which have only one element
 	adv_json_depth *depth = init_adv_json_depth();
 
-	char* ts = (char*)malloc(sizeof(char));
-	ts[0] = '\0';
+	char* ts = init_string();
 	adv_kv_obj* to;
 	adv_kv_array* ta;
 	char* tk;
@@ -448,6 +481,7 @@ void parse_json(adv_kv_or_a* collective, char* json_str){
 							push_to_kv_multi_stack(depth, NULL, NULL, NULL, ts);
 							push_adv_int_stack(i_stack, 7);
 						}
+						traverse_kv_multi_stack(depth);
 						oa_res = seek_adv_int_stack_first_arrival(i_stack, oa, 2);
 						switch(oa_res) {
 							case 0:
@@ -461,7 +495,7 @@ void parse_json(adv_kv_or_a* collective, char* json_str){
 								break;
 						}
 					}
-					free_tstring(ts);
+					ts = init_string();
 				}
 				break;
 			case '}':
@@ -500,6 +534,7 @@ void parse_json(adv_kv_or_a* collective, char* json_str){
 								tv = depth->depth_temp_value;
 								popped_c = pop_adv_int_stack(i_stack);
 								type_key = pop_to_kv_multi_stack(depth);
+								printf(">> %d, --%s, %d, %d", type, tv, popped_c, type_key);
 								if (popped_c == 2 && type == 3 && type_key == 2) {
 									tk = depth->depth_temp_key;
 									adv_kv_add_obj_str(sto, tk, tv);
@@ -527,7 +562,8 @@ void parse_json(adv_kv_or_a* collective, char* json_str){
 								isKey = true;
 								break;
 							default:
-								invalid = true;
+								if(!((i_stack->i[0] == 5 || i_stack->i[0] == 6) && i_stack->size == 1))
+									invalid = true;
 								break;
 						}
 					}
@@ -580,7 +616,8 @@ void parse_json(adv_kv_or_a* collective, char* json_str){
 								isKey = true;
 								break;
 							default:
-								invalid = true;
+								if(!((i_stack->i[0] == 5 || i_stack->i[0] == 6) && i_stack->size == 1))
+									invalid = true;
 								break;
 						}
 					}
@@ -633,7 +670,6 @@ void parse_json(adv_kv_or_a* collective, char* json_str){
 		printf("\n Error at dangling syntax stack %d, char: %c", i_stack->size, seek_adv_int_stack(i_stack));
 	} else {
 		type = pop_to_kv_multi_stack(depth);
-		printf("%d", type);
 		switch(type) {
 			case 0:
 				collective->type = 0;
