@@ -379,8 +379,7 @@ bool validate_json(char* json_str){
 
 
 // otop: on top of stack
-adv_kv_or_a* parse_json(char* json_str){
-	adv_kv_or_a* collective = (adv_kv_or_a*)malloc(sizeof(adv_kv_or_a));
+void parse_json(adv_kv_or_a* collective, char* json_str){
 	int oa[2] = {0, 1};
 	int oa_res;
 	bool invalid = false;
@@ -620,12 +619,27 @@ adv_kv_or_a* parse_json(char* json_str){
 			break;
 		}
 	}
-	if(c_stack->size > 0) {
+	if(i_stack->size != 1) {
 		invalid = true;
-		printf("\n Error at dangling syntax stack %d, char: %c", c_stack->size, seek_adv_char_stack(c_stack));
+		printf("\n Error at dangling syntax stack %d, char: %c", i_stack->size, seek_adv_int_stack(i_stack));
+	} else {
+		type = pop_to_kv_multi_stack(depth);
+		switch(type) {
+			case 0:
+				collective->type = 0;
+				collective->arr = depth->temp_arr;
+				break;
+			case 1:
+				collective->type = 1;
+				collective->obj = depth->temp_obj;
+				break;
+			default:
+				collective->type = -1;
+				invalid = true;
+				break;
+		}
 	}
 
-	return collective;
 }
 
 #endif
