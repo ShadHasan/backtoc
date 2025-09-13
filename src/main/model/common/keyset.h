@@ -64,7 +64,6 @@ void adv_add_key_lks(adv_lks_keys* lks, char* str, int type, int type_index) {
 		}
 		lks->count_keys++;
 	} else {
-		int current_type = keys->type;
 		keys->type = type;
 		keys->type_index = type_index;
 	}

@@ -198,15 +198,13 @@ void tstring(char* ts, char c) {
 		ts[len] = c;
 		ts[len+1] = '\0';
 	}
-	int len2 = strlen(ts);
+	// int len2 = strlen(ts);
 	// printf("pre: %d, post: %d", len, len2);
 	// printf(", %s\n", ts);
 }
 
 void free_tstring(char* ts) {
 	// printf("faulting");
-	int len = strlen(ts);
-	int i;
 	ts = (char*)realloc(ts, (1)*sizeof(char));
 	ts[0] = '\0';
 }
@@ -238,9 +236,8 @@ bool validate_json(char* json_str){
 
 	int len = strlen(json_str);
 
-	char c, poped_c;
+	char c;
 	bool isKey = true;
-	short type;  // array 0, object 1, string 2
 
 	// current level of depth which is root represent
 	// as 0 in json tree which have only one element
@@ -278,7 +275,7 @@ bool validate_json(char* json_str){
 				if (c != '"') {   // if " is not otos. Not string literal but json syntax
 					push_adv_char_stack(c_stack, '"');
 				} else {
-					poped_c = pop_adv_char_stack(c_stack);
+					pop_adv_char_stack(c_stack);
 					// here get the key in ts if isKey "true" else value
 					switch(c) {
 						case '{':
@@ -296,7 +293,7 @@ bool validate_json(char* json_str){
 					if (c != '{') {
 						invalid = true;
 					} else {
-						poped_c = pop_adv_char_stack(c_stack);
+						pop_adv_char_stack(c_stack);
 						// Todo: here link kv object to predecessor
 						free_tstring(ts);
 						reset_depth_element(depth);
@@ -309,7 +306,7 @@ bool validate_json(char* json_str){
 					if (c != '[') {
 						invalid = true;
 					} else {
-						poped_c = pop_adv_char_stack(c_stack);
+						pop_adv_char_stack(c_stack);
 						// Todo: here link kv array to predecessor
 						free_tstring(ts);
 						reset_depth_element(depth);
@@ -462,6 +459,7 @@ void parse_json(adv_kv_or_a* collective, char* json_str){
 					sto = adv_kv_init_obj();
 					popped_c = pop_adv_int_stack(i_stack);
 					while (popped_c != 1) {
+						printf("po %d", popped_c);
 						switch(popped_c) {
 							case 5:
 								type = pop_to_kv_multi_stack(depth);
@@ -535,7 +533,7 @@ void parse_json(adv_kv_or_a* collective, char* json_str){
 								type = pop_to_kv_multi_stack(depth);
 								ta = depth->temp_arr;
 								if (type == 0)
-									adv_kv_add_arr_str(sta, ta);
+									adv_kv_add_arr_arr(sta, ta);
 								else
 									invalid = true;
 								break;
@@ -543,7 +541,7 @@ void parse_json(adv_kv_or_a* collective, char* json_str){
 								type = pop_to_kv_multi_stack(depth);
 								to = depth->temp_obj;
 								if (type == 1)
-									adv_kv_add_arr_str(sta, to);
+									adv_kv_add_arr_obj(sta, to);
 								else
 									invalid = true;
 								break;
@@ -580,7 +578,8 @@ void parse_json(adv_kv_or_a* collective, char* json_str){
 				break;
 			case ':':    // Time to separate key from its value
 				if (c != 3) {
-					if (c == 1) { // semicolon is expected in object and in a string
+					oa_res = seek_adv_int_stack_first_arrival(i_stack, oa, 2);
+					if (oa_res == 1) { // semicolon is expected in object and in a string
 						if(!isKey) {
 							invalid = true; // value do not have followed value, only key have value.
 						} else {

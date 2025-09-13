@@ -38,7 +38,7 @@ void kv_test() {
 	adv_kv_traverse_obj(root_kv_obj);
 
 	// initialize as array
-	adv_kv_obj* kv_array_1 = adv_kv_init_arr();
+	adv_kv_array* kv_array_1 = adv_kv_init_arr();
 
 	// adding array to object type
 	adv_kv_add_obj_arr(root_kv_obj, "key4", kv_array_1);

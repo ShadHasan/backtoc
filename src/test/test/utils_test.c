@@ -3,7 +3,7 @@
 #include <stdbool.h>
 #include "c_lib/utils.h"
 
-void valid_jaon(char* str) {
+void valid_json(char* str) {
 	bool valid = validate_json(str);
 	if (valid) {
 		printf("\nPass: Valid json");
@@ -67,14 +67,18 @@ int json_validation_test() {
 	invalid_json(jsonstr10);
 	invalid_json(jsonstr11);
 
+	valid_json(jsonstr);
+	valid_json(vjsonstr1);
+	valid_json(vjsonstr2);
+	valid_json(vjsonstr3);
+	valid_json(vjsonstr4);
+	valid_json(vjsonstr5);
+	valid_json(vjsonstr6);
+	return 0;
+}
 
-	valid_jaon(vjsonstr1);
-	valid_jaon(vjsonstr2);
-	valid_jaon(vjsonstr3);
-	valid_jaon(vjsonstr4);
-	valid_jaon(vjsonstr5);
-	valid_jaon(vjsonstr6);
-
+int multi_stack_test() {
+	return 0;
 }
 
 int json_parsing_test(char* jsonstr) {
@@ -92,6 +96,7 @@ int json_parsing_test(char* jsonstr) {
 			printf("Invalid JSON string");
 			break;
 	}
+	return 0;
 }
 
 int json_test() {
