@@ -61,7 +61,7 @@ void push_adv_int_stack(adv_int_stack* stack, int i) {
 	stack->i[stack->size++] = i;
 }
 
-char seek_adv_int_stack(adv_int_stack* stack) {
+int seek_adv_int_stack(adv_int_stack* stack) {
 	return stack->i[stack->size-1];
 }
 
@@ -70,6 +70,18 @@ int pop_adv_int_stack(adv_int_stack* stack) {
 	stack->i = (int*)realloc(stack->i, (stack->size-1)*sizeof(int));
 	stack->size--;
 	return i;
+}
+
+char seek_adv_int_stack_first_arrival(adv_int_stack* stack, int* arr, int size_arr) {
+	int i, j;
+	for(i = stack->size-1; i >= 0; i--) {
+		for(j=0; j<size_arr; j++) {
+			if(arr[j] == stack->i[i]) {
+				return arr[j];
+			}
+		}
+	}
+	return -1;
 }
 
 #endif

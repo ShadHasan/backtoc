@@ -381,6 +381,8 @@ bool validate_json(char* json_str){
 // otop: on top of stack
 adv_kv_or_a* parse_json(char* json_str){
 	adv_kv_or_a* collective = (adv_kv_or_a*)malloc(sizeof(adv_kv_or_a));
+	int oa[2] = {0, 1};
+	int oa_res;
 	bool invalid = false;
 	int i, type, type_key;
 
@@ -435,8 +437,12 @@ adv_kv_or_a* parse_json(char* json_str){
 					} else {
 						if (isKey) {
 							push_to_kv_multi_stack(depth, NULL, NULL, ts, NULL);
+							push_adv_int_stack(i_stack, 2);
+							isKey = false;
 						} else {
 							push_to_kv_multi_stack(depth, NULL, NULL, NULL, ts);
+							push_adv_int_stack(i_stack, 7);
+							isKey = true;
 						}
 					}
 					free_tstring(ts);
@@ -495,6 +501,18 @@ adv_kv_or_a* parse_json(char* json_str){
 					if (!invalid) {
 						push_adv_int_stack(i_stack, 6);
 						push_to_kv_multi_stack(depth, sto, NULL, NULL, NULL);
+						oa_res = seek_adv_int_stack_first_arrival(i_stack, oa, 2);
+						switch(oa_res) {
+							case 0:
+								isKey = false;
+								break;
+							case 1:
+								isKey = true;
+								break;
+							default:
+								invalid = true;
+								break;
+						}
 					}
 				}
 				break;
@@ -536,19 +554,29 @@ adv_kv_or_a* parse_json(char* json_str){
 					if (!invalid) {
 						push_adv_int_stack(i_stack, 5);
 						push_to_kv_multi_stack(depth, NULL, sta, NULL, NULL);
+						oa_res = seek_adv_int_stack_first_arrival(i_stack, oa, 2);
+						switch(oa_res) {
+							case 0:
+								isKey = false;
+								break;
+							case 1:
+								isKey = true;
+								break;
+							default:
+								invalid = true;
+								break;
+						}
 					}
 				}
 				break;
 			case ':':    // Time to separate key from its value
-				if(!isKey) {
-					invalid = true; // value do not have followed value, only key have value.
-				} else {
-					if (c != 3) {  // if " is not on top of stack. It is not string literal but json syntax and it is key but value.
-						isKey = false;
-					} else {
-						if (c == '[') {   // if c is [(array) it does not expect semicolon
-							invalid = true;
+				if (c != 3) {
+					if (c == 1) { // semicolon is expected in object and in a string
+						if(!isKey) {
+							invalid = true; // value do not have followed value, only key have value.
 						}
+					} else {
+						invalid = true;  // semicolon is expected in object and in a string
 					}
 				}
 				break;
