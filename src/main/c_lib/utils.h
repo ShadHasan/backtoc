@@ -382,7 +382,7 @@ bool validate_json(char* json_str){
 adv_kv_or_a* parse_json(char* json_str){
 	adv_kv_or_a* collective = (adv_kv_or_a*)malloc(sizeof(adv_kv_or_a));
 	bool invalid = false;
-	int i;
+	int i, type, type_key;
 
 	int len = strlen(json_str);
 
@@ -395,6 +395,11 @@ adv_kv_or_a* parse_json(char* json_str){
 	char* ts = (char*)malloc(sizeof(char));
 	ts[0] = '\0';
 	adv_kv_obj* to;
+	adv_kv_array* ta;
+	char* tk;
+	char* tv;
+	adv_kv_obj* sto;
+	adv_kv_array* sta;
 
 
 	adv_int_stack* i_stack = init_adv_int_stack();
@@ -439,30 +444,42 @@ adv_kv_or_a* parse_json(char* json_str){
 				break;
 			case '}':
 				if (c != 3) {   // if " is not otos. Not string literal but json syntax
+					sto = adv_kv_init_obj();
 					popped_c = pop_adv_int_stack(i_stack);
-					to = adv_kv_init_obj();
 					while (popped_c != 1) {
 						switch(popped_c) {
 							case 5:
+								type = pop_to_kv_multi_stack(depth);
+								ta = depth->temp_arr;
 								popped_c = pop_adv_int_stack(i_stack);
-								if (popped_c == 2) {
-
+								type_key = pop_to_kv_multi_stack(depth);
+								if (popped_c == 2 && type == 0 && type_key == 2) {
+									tk = depth->depth_temp_key;
+									adv_kv_add_obj_arr(sto, tk, ta);
 								} else {
 									invalid = true;
 								}
 								break;
 							case 6:
+								type = pop_to_kv_multi_stack(depth);
+								to = depth->temp_obj;
 								popped_c = pop_adv_int_stack(i_stack);
-								if (popped_c == 2) {
-
+								type_key = pop_to_kv_multi_stack(depth);
+								if (popped_c == 2 && type == 1 && type_key == 2) {
+									tk = depth->depth_temp_key;
+									adv_kv_add_obj_obj(sto, tk, to);
 								} else {
 									invalid = true;
 								}
 								break;
 							case 7:
+								type = pop_to_kv_multi_stack(depth);
+								tv = depth->depth_temp_value;
 								popped_c = pop_adv_int_stack(i_stack);
-								if (popped_c == 2) {
-
+								type_key = pop_to_kv_multi_stack(depth);
+								if (popped_c == 2 && type == 1 && type_key == 2) {
+									tk = depth->depth_temp_key;
+									adv_kv_add_obj_str(sto, tk, tv);
 								} else {
 									invalid = true;
 								}
@@ -471,8 +488,9 @@ adv_kv_or_a* parse_json(char* json_str){
 								invalid = true;
 								break;
 						}
-
+						popped_c = pop_adv_int_stack(i_stack);
 					}
+
 				}
 				break;
 			case ']':
