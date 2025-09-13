@@ -438,11 +438,21 @@ adv_kv_or_a* parse_json(char* json_str){
 						if (isKey) {
 							push_to_kv_multi_stack(depth, NULL, NULL, ts, NULL);
 							push_adv_int_stack(i_stack, 2);
-							isKey = false;
 						} else {
 							push_to_kv_multi_stack(depth, NULL, NULL, NULL, ts);
 							push_adv_int_stack(i_stack, 7);
-							isKey = true;
+						}
+						oa_res = seek_adv_int_stack_first_arrival(i_stack, oa, 2);
+						switch(oa_res) {
+							case 0:
+								isKey = false;
+								break;
+							case 1:
+								isKey = true;
+								break;
+							default:
+								invalid = true;
+								break;
 						}
 					}
 					free_tstring(ts);
@@ -574,6 +584,8 @@ adv_kv_or_a* parse_json(char* json_str){
 					if (c == 1) { // semicolon is expected in object and in a string
 						if(!isKey) {
 							invalid = true; // value do not have followed value, only key have value.
+						} else {
+							isKey = false;
 						}
 					} else {
 						invalid = true;  // semicolon is expected in object and in a string
@@ -581,24 +593,18 @@ adv_kv_or_a* parse_json(char* json_str){
 				}
 				break;
 			case ',':
-				if (c != 3) {  // if " is not otos. Not string literal but json syntax and it is either next key-value or value of an array
-					// TODO: invalid if current kv object or array does not have any value or key-value
-					if (depth->depth_element[depth->current_depth] == 0) {
-						invalid = true;
-					} else {
-						reset_depth_element(depth);
-						switch(c) {
-						case '{':
-							// pop value and key and link with current object
-							seek_type_kv_multi_stack();
-							isKey = true;
-							break;
-						case '[':
-							// TODO: push value to current kv array
+				if (c != 3) {
+					oa_res = seek_adv_int_stack_first_arrival(i_stack, oa, 2);
+					switch(oa_res) {
+						case 0:
 							isKey = false;
 							break;
-						}
-						free_tstring(ts);
+						case 1:
+							isKey = true;
+							break;
+						default:
+							invalid = true;
+							break;
 					}
 				}
 				break;
@@ -610,7 +616,7 @@ adv_kv_or_a* parse_json(char* json_str){
 		}
 
 		if (invalid) {
-			printf("\n Error at char: '%c', index: %d, stack: %c, ts: %s\n", json_str[i], i, c, ts);
+			printf("\n Error at char: '%c', index: %d, stack: %d, ts: %s\n", json_str[i], i, c, ts);
 			break;
 		}
 	}
