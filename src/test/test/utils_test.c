@@ -77,15 +77,10 @@ int json_validation_test() {
 
 }
 
-int json_parsing_test() {
-
-}
-
-int json_test() {
-	// json_validation_test();
-	char* jsonstr = "{\"key\": \"value\"}";
+int json_parsing_test(char* jsonstr) {
 	adv_kv_or_a* collective = (adv_kv_or_a*)malloc(sizeof(adv_kv_or_a));
-	json_parsing_test(collective, jsonstr);
+	collective->type = -1;
+	parse_json(collective, jsonstr);
 	switch(collective->type) {
 		case 0:
 			adv_kv_traverse_arr(collective->arr);
@@ -96,7 +91,13 @@ int json_test() {
 		default:
 			printf("Invalid JSON string");
 			break;
-
 	}
+}
+
+int json_test() {
+	// json_validation_test();
+	char* jsonstr = "{\"key\": \"value\"}";
+	json_parsing_test(jsonstr);
+
 	return 0;
 }

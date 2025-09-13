@@ -410,7 +410,7 @@ void parse_json(adv_kv_or_a* collective, char* json_str){
 			c = seek_adv_int_stack(i_stack);
 		else
 			c = -1;
-
+		printf("(%d, %c) ", c, json_str[i]);
 		switch(json_str[i]) {
 			case '{':
 				if (c != 3) {   // if " is not otos. Not string literal but json syntax
@@ -624,6 +624,7 @@ void parse_json(adv_kv_or_a* collective, char* json_str){
 		printf("\n Error at dangling syntax stack %d, char: %c", i_stack->size, seek_adv_int_stack(i_stack));
 	} else {
 		type = pop_to_kv_multi_stack(depth);
+		printf("%d", type);
 		switch(type) {
 			case 0:
 				collective->type = 0;
