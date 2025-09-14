@@ -69,7 +69,7 @@ void push_to_kv_multi_stack(adv_json_depth* depth_tracer, adv_kv_obj* obj, adv_k
 			}
 		}
 	}
-	printf("pushed: %d,%d", kmts->type_allocated, kmts->stack_size);
+	// printf("pushed: %d,%d", kmts->type_allocated, kmts->stack_size);
 
 	if (kmts->type_allocated <= (kmts->stack_size+1)) {
 		if (kmts->stack_size == 0) {
@@ -462,7 +462,7 @@ void parse_json(adv_kv_or_a* collective, char* json_str){
 			c = seek_adv_int_stack(i_stack);
 		else
 			c = -1;
-		printf("(%d, %c) ", c, json_str[i]);
+		// printf("(%d, %c) ", c, json_str[i]);
 		switch(json_str[i]) {
 			case '{':
 				if (c != 3) {   // if " is not otos. Not string literal but json syntax
@@ -593,7 +593,7 @@ void parse_json(adv_kv_or_a* collective, char* json_str){
 				if (c != 3) {
 					sta = adv_kv_init_arr();
 					popped_c = pop_adv_int_stack(i_stack);
-					traverse_kv_multi_stack(depth);
+					// traverse_kv_multi_stack(depth);
 					while(popped_c != 0) {
 						switch(popped_c) {
 							case 5:
@@ -601,28 +601,31 @@ void parse_json(adv_kv_or_a* collective, char* json_str){
 								ta = depth->temp_arr;
 								if (type == 0)
 									adv_kv_add_arr_arr(sta, ta);
-								else
+								else {
 									invalid = true;
 									error_code = 108;
+								}
 								break;
 							case 6:
 								type = pop_to_kv_multi_stack(depth);
 								to = depth->temp_obj;
 								if (type == 1)
 									adv_kv_add_arr_obj(sta, to);
-								else
+								else {
 									invalid = true;
 									error_code = 109;
+								}
 								break;
 							case 7:
 								type = pop_to_kv_multi_stack(depth);
 								tv = depth->depth_temp_value;
 								if (type == 3)
 									adv_kv_add_arr_str(sta, tv);
-								else
-									printf("%d", type);
+								else {
+									printf(">> %d", type);
 									invalid = true;
 									error_code = 110;
+								}
 								break;
 						}
 						if (invalid)
