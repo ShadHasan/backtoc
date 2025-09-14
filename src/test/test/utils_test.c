@@ -22,6 +22,7 @@ void invalid_json(char* str) {
 }
 
 int json_validation_test() {
+	printf("\n*************** JSON Validation Test Start **********************\n");
 	char* jsonstr = "{\"key\": \"value\", \"key2\": [], \"key3\": {}}";
 
 	// List of invalid json
@@ -74,10 +75,12 @@ int json_validation_test() {
 	valid_json(vjsonstr4);
 	valid_json(vjsonstr5);
 	valid_json(vjsonstr6);
+	printf("\n*************** JSON Validation Test End **********************\n");
 	return 0;
 }
 
 int multi_stack_test() {
+	printf("\n*************** MultiStack Test Start **********************\n");
 	adv_json_depth *depth = init_adv_json_depth();
 	int type;
 
@@ -89,11 +92,11 @@ int multi_stack_test() {
 	type = pop_to_kv_multi_stack(depth);
 	printf("%d, %s", type, depth->depth_temp_key);
 	printf("\n");
+	printf("\n*************** MultiStack Test End **********************\n");
 	return 0;
 }
 
-int json_parsing_test() {
-	char* jsonstr = "{\"key\": \"value\"}";
+int validate_json_parse(char* jsonstr) {
 	adv_kv_or_a* collective = (adv_kv_or_a*)malloc(sizeof(adv_kv_or_a));
 	collective->type = -1;
 	parse_json(collective, jsonstr);
@@ -111,8 +114,19 @@ int json_parsing_test() {
 	return 0;
 }
 
+int json_parsing_test() {
+	printf("\n*************** JSON Parsing Test Start **********************\n");
+	char* vjsonstr1 = "{\"key\": \"value\"}";
+	char* vjsonstr2 = "{\"key\": \"value\", \"key2\": [], \"key3\": {\"key3\":{}}}";
+
+	validate_json_parse(vjsonstr1);
+	validate_json_parse(vjsonstr2);
+	printf("\n*************** JSON Parsing Test End **********************\n");
+	return 0;
+}
+
 int json_test() {
-	// json_validation_test();
+	json_validation_test();
 
 	multi_stack_test();
 	json_parsing_test();

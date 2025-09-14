@@ -450,7 +450,7 @@ void parse_json(adv_kv_or_a* collective, char* json_str){
 			c = seek_adv_int_stack(i_stack);
 		else
 			c = -1;
-		printf("(%d, %c) ", c, json_str[i]);
+		// printf("(%d, %c) ", c, json_str[i]);
 		switch(json_str[i]) {
 			case '{':
 				if (c != 3) {   // if " is not otos. Not string literal but json syntax
@@ -481,7 +481,7 @@ void parse_json(adv_kv_or_a* collective, char* json_str){
 							push_to_kv_multi_stack(depth, NULL, NULL, NULL, ts);
 							push_adv_int_stack(i_stack, 7);
 						}
-						traverse_kv_multi_stack(depth);
+						// traverse_kv_multi_stack(depth);  // debug is the best way to debug
 						oa_res = seek_adv_int_stack_first_arrival(i_stack, oa, 2);
 						switch(oa_res) {
 							case 0:
@@ -503,7 +503,6 @@ void parse_json(adv_kv_or_a* collective, char* json_str){
 					sto = adv_kv_init_obj();
 					popped_c = pop_adv_int_stack(i_stack);
 					while (popped_c != 1) {
-						printf("po %d", popped_c);
 						switch(popped_c) {
 							case 5:
 								type = pop_to_kv_multi_stack(depth);

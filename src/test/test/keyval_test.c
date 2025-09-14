@@ -3,6 +3,7 @@
 #include "model/common/keyset.h"
 
 void kv_test() {
+	printf("\n*************** KeyVal Test Start **********************\n");
 	adv_lks_keys* keyset = adv_init_lks();
 	adv_add_key_lks(keyset, "hello", 2, 0);
 	adv_add_key_lks(keyset, "world", 2, 2);
@@ -59,7 +60,6 @@ void kv_test() {
 	adv_kv_add_obj_str(kv_obj_1, "key1", "value1");
 	adv_kv_add_obj_str(kv_obj_1, "key2", "value2");
 	adv_kv_add_obj_obj(root_kv_obj, "key5", kv_obj_1);
-	printf("=========");
 	adv_kv_traverse_obj(root_kv_obj);
-	printf("=========");
+	printf("\n*************** KeyVal Test End **********************\n");
 }

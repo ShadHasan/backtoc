@@ -1,6 +1,7 @@
 #include "model/common/stack.h"
 
 void stack_char_test() {
+	printf("\n*************** Stack Char Test Start **********************\n");
 	char c;
 	adv_char_stack* c_stack = init_adv_char_stack();
 	push_adv_char_stack(c_stack, 'f');
@@ -20,4 +21,5 @@ void stack_char_test() {
 		c = pop_adv_char_stack(c_stack);
 		printf("\n pop stack: %c \n",c);
 	}
+	printf("\n*************** Stack Char Test End **********************\n");
 }
