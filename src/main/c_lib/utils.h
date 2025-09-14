@@ -69,6 +69,7 @@ void push_to_kv_multi_stack(adv_json_depth* depth_tracer, adv_kv_obj* obj, adv_k
 			}
 		}
 	}
+	printf("pushed: %d,%d", kmts->type_allocated, kmts->stack_size);
 
 	if (kmts->type_allocated <= (kmts->stack_size+1)) {
 		if (kmts->stack_size == 0) {
@@ -78,9 +79,9 @@ void push_to_kv_multi_stack(adv_json_depth* depth_tracer, adv_kv_obj* obj, adv_k
 			kmts->type_track = (int*)realloc(kmts->type_track, (kmts->stack_size+1)*sizeof(int));
 			kmts->type_allocated = kmts->stack_size + 1;
 		}
-		kmts->type_track[kmts->stack_size++] = type;
 	}
-
+	kmts->type_track[kmts->stack_size] = type;
+	kmts->stack_size++;
 	switch(type) {
 		case 0:
 			if (kmts->allocated_0 <= kmts->type_0_size) {
@@ -89,9 +90,10 @@ void push_to_kv_multi_stack(adv_json_depth* depth_tracer, adv_kv_obj* obj, adv_k
 				} else {
 					kmts->arr = (adv_kv_array**)realloc(kmts->arr, (kmts->type_0_size + 1)*sizeof(adv_kv_array*));
 				}
-				kmts->allocated_0 = ++kmts->type_0_size;
+				kmts->allocated_0 = kmts->type_0_size+1;
 			}
-			kmts->arr[kmts->type_0_size-1] = arr;
+			kmts->arr[kmts->type_0_size] = arr;
+			kmts->type_0_size++;
 			break;
 		case 1:
 			if (kmts->allocated_1 <= kmts->type_1_size) {
@@ -100,9 +102,10 @@ void push_to_kv_multi_stack(adv_json_depth* depth_tracer, adv_kv_obj* obj, adv_k
 				} else {
 					kmts->obj = (adv_kv_obj**)realloc(kmts->obj, (kmts->type_1_size + 1)*sizeof(adv_kv_obj*));
 				}
-				kmts->allocated_1 = ++kmts->type_1_size;
+				kmts->allocated_1 = kmts->type_1_size+1;
 			}
-			kmts->obj[kmts->type_1_size-1] = obj;
+			kmts->obj[kmts->type_1_size] = obj;
+			kmts->type_1_size++;
 			break;
 		case 2:
 			if (kmts->allocated_2 <= kmts->type_2_size) {
@@ -111,9 +114,10 @@ void push_to_kv_multi_stack(adv_json_depth* depth_tracer, adv_kv_obj* obj, adv_k
 				} else {
 					kmts->key = (char**)realloc(kmts->key, (kmts->type_2_size + 1)*sizeof(char*));
 				}
-				kmts->allocated_2 = ++kmts->type_2_size;
+				kmts->allocated_2 = kmts->type_2_size+1;
 			}
-			kmts->key[kmts->type_2_size-1] = key;
+			kmts->key[kmts->type_2_size] = key;
+			kmts->type_2_size++;
 			break;
 		case 3:
 			if (kmts->allocated_3 <= kmts->type_3_size) {
@@ -122,9 +126,10 @@ void push_to_kv_multi_stack(adv_json_depth* depth_tracer, adv_kv_obj* obj, adv_k
 				} else {
 					kmts->value = (char**)realloc(kmts->value, (kmts->type_3_size + 1)*sizeof(char*));
 				}
-				kmts->allocated_3 = ++kmts->type_3_size;
+				kmts->allocated_3 = kmts->type_3_size+1;
 			}
-			kmts->value[kmts->type_3_size-1] = value;
+			kmts->value[kmts->type_3_size] = value;
+			kmts->type_3_size++;
 			break;
 	}
 
@@ -180,9 +185,9 @@ void traverse_kv_multi_stack(adv_json_depth* depth_tracer) {
 	int type;
 	int i, count_0, count_1, count_2, count_3 = 0;
 	count_0 = count_1 = count_2 = count_3;
-	printf("Count k: %d v: %d, a: %d, o: %d", count_2, count_3, count_0, count_1);
 	for (i = 0; i<kmts->stack_size; i++) {
 		type = kmts->type_track[i];
+		printf("\n");
 		switch(type) {
 			case 0:
 				printf("-a> ");
@@ -203,8 +208,9 @@ void traverse_kv_multi_stack(adv_json_depth* depth_tracer) {
 				count_3++;
 				break;
 		}
-		printf("\n");
+
 	}
+	printf("\n Count stack: %d, k: %d v: %d, a: %d, o: %d\n", kmts->stack_size, count_2, count_3, count_0, count_1);
 }
 
 adv_json_depth* init_adv_json_depth() {
@@ -519,8 +525,7 @@ void parse_json(adv_kv_or_a* collective, char* json_str){
 								type_key = pop_to_kv_multi_stack(depth);
 								if (popped_c == 2 && type == 0 && type_key == 2) {
 									tk = depth->depth_temp_key;
-									//printf("arr");
-									//adv_kv_add_obj_arr(sto, tk, ta);
+									adv_kv_add_obj_arr(sto, tk, ta);
 								} else {
 									invalid = true;
 									error_code = 103;
@@ -533,9 +538,7 @@ void parse_json(adv_kv_or_a* collective, char* json_str){
 								type_key = pop_to_kv_multi_stack(depth);
 								if (popped_c == 2 && type == 1 && type_key == 2) {
 									tk = depth->depth_temp_key;
-									printf("obj");
-									adv_kv_traverse_obj(to);
-									// adv_kv_add_obj_obj(sto, tk, to);
+									adv_kv_add_obj_obj(sto, tk, to);
 								} else {
 									invalid = true;
 									error_code = 104;
@@ -549,7 +552,6 @@ void parse_json(adv_kv_or_a* collective, char* json_str){
 								// printf(">> %d, --%s, %d, %d", type, tv, popped_c, type_key);
 								if (popped_c == 2 && type == 3 && type_key == 2) {
 									tk = depth->depth_temp_key;
-									printf("val");
 									adv_kv_add_obj_str(sto, tk, tv);
 								} else {
 									invalid = true;
@@ -591,6 +593,7 @@ void parse_json(adv_kv_or_a* collective, char* json_str){
 				if (c != 3) {
 					sta = adv_kv_init_arr();
 					popped_c = pop_adv_int_stack(i_stack);
+					traverse_kv_multi_stack(depth);
 					while(popped_c != 0) {
 						switch(popped_c) {
 							case 5:
