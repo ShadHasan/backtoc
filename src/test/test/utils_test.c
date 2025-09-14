@@ -121,10 +121,16 @@ int json_parsing_test() {
 	char* vjsonstr1 = "{\"key\": \"value\"}";
 	char* vjsonstr2 = "{\"key\": \"value\", \"key2\": [], \"key3\": {\"key3\":{}}}";
 	char* vjsonstr3 = "{\"k1\": {\"k1\": \"s1\", \"k2\": \"s2\"}, \"k2\": [\"s1\", \"s2\"], \"k3\": \"s3\", \"k4\": {\"k1\": {\"k1\": \"s1\"}, \"k2\": [\"s1\", \"s2\"], \"k3\": \"s1\"}}";
+	char* vjsonstr4 = "{\"k1\": {\"k1\": \"s1\", \"k2\": \"s2\"}, \"k2\": [\"s1\", \"s2\"]"
+			", \"k3\": \"s3\", \"k4\": {\"k1\": {\"k1\": \"s1\"}, \"k2\": [\"s1\", \"s2\"], \"k3\": \"s1\"},"
+			"\"k5\": [{\"k1\": \"s1\", \"k2\": \"s2\"}, [\"s1\", \"s2\"], \"s1\"],"
+			"\"k6\": {}, \"k7\": [], \"k8\": {\"k3\": {}}, \"k9\": [[]],"
+			"\"k10\": [{}, []], \"k11\": [{\"k1\": \"s1\"}, [], {\"k1\": []}]"
+			"}";
 
 	// validate_json_parse(vjsonstr1);
 	// validate_json_parse(vjsonstr2);
-	validate_json_parse(vjsonstr3);
+	validate_json_parse(vjsonstr4);
 	printf("\n*************** JSON Parsing Test End **********************\n");
 	return 0;
 }
