@@ -51,15 +51,6 @@ struct kv_multi_type_stack {
 void push_to_kv_multi_stack(adv_json_depth* depth_tracer, adv_kv_obj* obj, adv_kv_array* arr, char* key, char* value) {
 	kv_multi_type_stack* kmts = depth_tracer->kmts;
 	int type;
-	if (kmts->type_allocated <= (kmts->stack_size+1)) {
-		if (kmts->stack_size == 0) {
-			kmts->type_track = (int*)malloc(sizeof(int));
-			kmts->type_allocated = 1;
-		} else {
-			kmts->type_track = (int*)realloc(kmts->type_track, (kmts->stack_size+1)*sizeof(int));
-			kmts->type_allocated = kmts->stack_size + 1;
-		}
-	}
 	if (obj != NULL) {
 		type = 1;
 	} else {
@@ -78,7 +69,18 @@ void push_to_kv_multi_stack(adv_json_depth* depth_tracer, adv_kv_obj* obj, adv_k
 			}
 		}
 	}
-	kmts->type_track[kmts->stack_size] = type;
+
+	if (kmts->type_allocated <= (kmts->stack_size+1)) {
+		if (kmts->stack_size == 0) {
+			kmts->type_track = (int*)malloc(sizeof(int));
+			kmts->type_allocated = 1;
+		} else {
+			kmts->type_track = (int*)realloc(kmts->type_track, (kmts->stack_size+1)*sizeof(int));
+			kmts->type_allocated = kmts->stack_size + 1;
+		}
+		kmts->type_track[kmts->stack_size++] = type;
+	}
+
 	switch(type) {
 		case 0:
 			if (kmts->allocated_0 <= kmts->type_0_size) {
@@ -125,7 +127,6 @@ void push_to_kv_multi_stack(adv_json_depth* depth_tracer, adv_kv_obj* obj, adv_k
 			kmts->value[kmts->type_3_size-1] = value;
 			break;
 	}
-	kmts->stack_size++;
 
 }
 
@@ -179,15 +180,18 @@ void traverse_kv_multi_stack(adv_json_depth* depth_tracer) {
 	int type;
 	int i, count_0, count_1, count_2, count_3 = 0;
 	count_0 = count_1 = count_2 = count_3;
+	printf("Count k: %d v: %d, a: %d, o: %d", count_2, count_3, count_0, count_1);
 	for (i = 0; i<kmts->stack_size; i++) {
 		type = kmts->type_track[i];
 		switch(type) {
 			case 0:
-				// kmts->arr[count_0];
+				printf("-a> ");
+				adv_kv_traverse_arr(kmts->arr[count_0]);
 				count_0++;
 				break;
 			case 1:
-				// kmts->obj[count_1];
+				printf("-o> ");
+				adv_kv_traverse_obj(kmts->obj[count_1]);
 				count_1++;
 				break;
 			case 2:
@@ -199,6 +203,7 @@ void traverse_kv_multi_stack(adv_json_depth* depth_tracer) {
 				count_3++;
 				break;
 		}
+		printf("\n");
 	}
 }
 
@@ -424,6 +429,7 @@ void parse_json(adv_kv_or_a* collective, char* json_str){
 	int oa[2] = {0, 1};
 	int oa_res;
 	bool invalid = false;
+	int error_code;
 	int i, type, type_key;
 
 	int len = strlen(json_str);
@@ -450,7 +456,7 @@ void parse_json(adv_kv_or_a* collective, char* json_str){
 			c = seek_adv_int_stack(i_stack);
 		else
 			c = -1;
-		// printf("(%d, %c) ", c, json_str[i]);
+		printf("(%d, %c) ", c, json_str[i]);
 		switch(json_str[i]) {
 			case '{':
 				if (c != 3) {   // if " is not otos. Not string literal but json syntax
@@ -473,6 +479,7 @@ void parse_json(adv_kv_or_a* collective, char* json_str){
 					popped_c = pop_adv_int_stack(i_stack);
 					if (popped_c != 3) {
 						invalid = true;
+						error_code = 101;
 					} else {
 						if (isKey) {
 							push_to_kv_multi_stack(depth, NULL, NULL, ts, NULL);
@@ -481,7 +488,7 @@ void parse_json(adv_kv_or_a* collective, char* json_str){
 							push_to_kv_multi_stack(depth, NULL, NULL, NULL, ts);
 							push_adv_int_stack(i_stack, 7);
 						}
-						// traverse_kv_multi_stack(depth);  // debug is the best way to debug
+						// traverse_kv_multi_stack(depth);  // traverse is the best way to debug
 						oa_res = seek_adv_int_stack_first_arrival(i_stack, oa, 2);
 						switch(oa_res) {
 							case 0:
@@ -492,6 +499,7 @@ void parse_json(adv_kv_or_a* collective, char* json_str){
 								break;
 							default:
 								invalid = true;
+								error_code = 102;
 								break;
 						}
 					}
@@ -511,9 +519,11 @@ void parse_json(adv_kv_or_a* collective, char* json_str){
 								type_key = pop_to_kv_multi_stack(depth);
 								if (popped_c == 2 && type == 0 && type_key == 2) {
 									tk = depth->depth_temp_key;
-									adv_kv_add_obj_arr(sto, tk, ta);
+									//printf("arr");
+									//adv_kv_add_obj_arr(sto, tk, ta);
 								} else {
 									invalid = true;
+									error_code = 103;
 								}
 								break;
 							case 6:
@@ -523,9 +533,12 @@ void parse_json(adv_kv_or_a* collective, char* json_str){
 								type_key = pop_to_kv_multi_stack(depth);
 								if (popped_c == 2 && type == 1 && type_key == 2) {
 									tk = depth->depth_temp_key;
-									adv_kv_add_obj_obj(sto, tk, to);
+									printf("obj");
+									adv_kv_traverse_obj(to);
+									// adv_kv_add_obj_obj(sto, tk, to);
 								} else {
 									invalid = true;
+									error_code = 104;
 								}
 								break;
 							case 7:
@@ -533,16 +546,19 @@ void parse_json(adv_kv_or_a* collective, char* json_str){
 								tv = depth->depth_temp_value;
 								popped_c = pop_adv_int_stack(i_stack);
 								type_key = pop_to_kv_multi_stack(depth);
-								printf(">> %d, --%s, %d, %d", type, tv, popped_c, type_key);
+								// printf(">> %d, --%s, %d, %d", type, tv, popped_c, type_key);
 								if (popped_c == 2 && type == 3 && type_key == 2) {
 									tk = depth->depth_temp_key;
+									printf("val");
 									adv_kv_add_obj_str(sto, tk, tv);
 								} else {
 									invalid = true;
+									error_code = 105;
 								}
 								break;
 							default:
 								invalid = true;
+								error_code = 106;
 								break;
 						}
 						if (invalid)
@@ -561,8 +577,11 @@ void parse_json(adv_kv_or_a* collective, char* json_str){
 								isKey = true;
 								break;
 							default:
-								if(!((i_stack->i[0] == 5 || i_stack->i[0] == 6) && i_stack->size == 1))
+								if(!((i_stack->i[0] == 5 || i_stack->i[0] == 6) && i_stack->size == 1)) {
 									invalid = true;
+									error_code = 107;
+								}
+
 								break;
 						}
 					}
@@ -581,6 +600,7 @@ void parse_json(adv_kv_or_a* collective, char* json_str){
 									adv_kv_add_arr_arr(sta, ta);
 								else
 									invalid = true;
+									error_code = 108;
 								break;
 							case 6:
 								type = pop_to_kv_multi_stack(depth);
@@ -589,6 +609,7 @@ void parse_json(adv_kv_or_a* collective, char* json_str){
 									adv_kv_add_arr_obj(sta, to);
 								else
 									invalid = true;
+									error_code = 109;
 								break;
 							case 7:
 								type = pop_to_kv_multi_stack(depth);
@@ -596,7 +617,9 @@ void parse_json(adv_kv_or_a* collective, char* json_str){
 								if (type == 3)
 									adv_kv_add_arr_str(sta, tv);
 								else
+									printf("%d", type);
 									invalid = true;
+									error_code = 110;
 								break;
 						}
 						if (invalid)
@@ -615,8 +638,10 @@ void parse_json(adv_kv_or_a* collective, char* json_str){
 								isKey = true;
 								break;
 							default:
-								if(!((i_stack->i[0] == 5 || i_stack->i[0] == 6) && i_stack->size == 1))
+								if(!((i_stack->i[0] == 5 || i_stack->i[0] == 6) && i_stack->size == 1)) {
 									invalid = true;
+									error_code = 111;
+								}
 								break;
 						}
 					}
@@ -628,11 +653,13 @@ void parse_json(adv_kv_or_a* collective, char* json_str){
 					if (oa_res == 1) { // semicolon is expected in object and in a string
 						if(!isKey) {
 							invalid = true; // value do not have followed value, only key have value.
+							error_code = 112;
 						} else {
 							isKey = false;
 						}
 					} else {
 						invalid = true;  // semicolon is expected in object and in a string
+						error_code = 113;
 					}
 				}
 				break;
@@ -648,6 +675,7 @@ void parse_json(adv_kv_or_a* collective, char* json_str){
 							break;
 						default:
 							invalid = true;
+							error_code = 114;
 							break;
 					}
 				}
@@ -658,14 +686,14 @@ void parse_json(adv_kv_or_a* collective, char* json_str){
 				}
 				break;
 		}
-
 		if (invalid) {
-			printf("\n Error at char: '%c', index: %d, stack: %d, ts: %s\n", json_str[i], i, c, ts);
+			printf("\n Error at char: '%c', index: %d, stack: %d, ts: %s error: %d\n", json_str[i], i, c, ts, error_code);
 			break;
 		}
 	}
 	if(i_stack->size != 1) {
 		invalid = true;
+		error_code = 115;
 		printf("\n Error at dangling syntax stack %d, char: %c", i_stack->size, seek_adv_int_stack(i_stack));
 	} else {
 		type = pop_to_kv_multi_stack(depth);
@@ -681,6 +709,7 @@ void parse_json(adv_kv_or_a* collective, char* json_str){
 			default:
 				collective->type = -1;
 				invalid = true;
+				error_code = 116;
 				break;
 		}
 	}

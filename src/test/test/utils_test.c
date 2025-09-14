@@ -97,9 +97,11 @@ int multi_stack_test() {
 }
 
 int validate_json_parse(char* jsonstr) {
+	printf("\ntesting string ... %s\n", jsonstr);
 	adv_kv_or_a* collective = (adv_kv_or_a*)malloc(sizeof(adv_kv_or_a));
 	collective->type = -1;
 	parse_json(collective, jsonstr);
+
 	switch(collective->type) {
 		case 0:
 			adv_kv_traverse_arr(collective->arr);
@@ -118,9 +120,11 @@ int json_parsing_test() {
 	printf("\n*************** JSON Parsing Test Start **********************\n");
 	char* vjsonstr1 = "{\"key\": \"value\"}";
 	char* vjsonstr2 = "{\"key\": \"value\", \"key2\": [], \"key3\": {\"key3\":{}}}";
+	char* vjsonstr3 = "{\"k1\": {\"k1\": \"s1\", \"k2\": \"s2\"}, \"k2\": [\"s1\", \"s2\"], \"k3\": \"s3\", \"k4\": {\"k1\": {\"k1\": \"s1\"}, \"k2\": [\"s1\", \"s2\"], \"k3\": \"s1\"}}";
 
-	validate_json_parse(vjsonstr1);
-	validate_json_parse(vjsonstr2);
+	// validate_json_parse(vjsonstr1);
+	// validate_json_parse(vjsonstr2);
+	validate_json_parse(vjsonstr3);
 	printf("\n*************** JSON Parsing Test End **********************\n");
 	return 0;
 }
