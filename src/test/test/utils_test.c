@@ -97,7 +97,7 @@ int multi_stack_test() {
 }
 
 int validate_json_parse(char* jsonstr) {
-	printf("\ntesting string ... %s\n", jsonstr);
+	printf("\nTesting string ... %s\n", jsonstr);
 	adv_kv_or_a* collective = (adv_kv_or_a*)malloc(sizeof(adv_kv_or_a));
 	collective->type = -1;
 	parse_json(collective, jsonstr);
