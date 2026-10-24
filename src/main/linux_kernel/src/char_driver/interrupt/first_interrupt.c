@@ -1,3 +1,10 @@
+/* Not working
+ * For some reason it is killing entire kernel when I try to run
+ * sudo rmmod first_interrupt
+ *
+ * May something I am missing while I was writing.
+ */
+
 #include <linux/kernel.h>
 #include <linux/module.h>
 #include <linux/interrupt.h>
